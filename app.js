@@ -71,6 +71,48 @@ const SEED_DATA = {
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
       salary: { base: 6000, hra: 2000, allowance: 1200, deductions: 750 },
       leaves: { paid: 8, sick: 4, unpaid: 0 }
+    },
+    {
+      id: 'EMP-7441',
+      name: 'Priya Shah',
+      role: 'employee',
+      title: 'Product Manager',
+      dept: 'Product',
+      email: 'priya.shah@dayflow.io',
+      phone: '+1 (555) 672-1188',
+      address: '17 Market Street, Metro City',
+      doj: 'Jun 12, 2022',
+      avatar: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=150&auto=format&fit=crop&q=80',
+      salary: { base: 5800, hra: 1900, allowance: 1100, deductions: 700 },
+      leaves: { paid: 11, sick: 6, unpaid: 0 }
+    },
+    {
+      id: 'EMP-8563',
+      name: 'Jordan Lee',
+      role: 'employee',
+      title: 'QA Automation Engineer',
+      dept: 'Quality Assurance',
+      email: 'jordan.lee@dayflow.io',
+      phone: '+1 (555) 284-9301',
+      address: '29 Test Lane, Innovation Park',
+      doj: 'Aug 08, 2024',
+      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
+      salary: { base: 4700, hra: 1500, allowance: 900, deductions: 520 },
+      leaves: { paid: 15, sick: 8, unpaid: 0 }
+    },
+    {
+      id: 'EMP-9674',
+      name: 'Maya Williams',
+      role: 'employee',
+      title: 'Marketing Specialist',
+      dept: 'Marketing',
+      email: 'maya.williams@dayflow.io',
+      phone: '+1 (555) 418-7620',
+      address: '63 Harbor Avenue, Lakeside',
+      doj: 'Feb 20, 2025',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      salary: { base: 4300, hra: 1400, allowance: 850, deductions: 480 },
+      leaves: { paid: 13, sick: 7, unpaid: 0 }
     }
   ],
   attendanceLogs: [
@@ -154,10 +196,18 @@ function loadState() {
   const saved = localStorage.getItem('dayflow_app_state_v2');
   if (saved) {
     appState = JSON.parse(saved);
+    syncSeedUsers();
+    saveState();
   } else {
     appState = SEED_DATA;
     saveState();
   }
+}
+
+function syncSeedUsers() {
+  const existingIds = new Set(appState.users.map(user => user.id));
+  const missingUsers = SEED_DATA.users.filter(user => !existingIds.has(user.id));
+  appState.users.push(...missingUsers);
 }
 
 function saveState() {
