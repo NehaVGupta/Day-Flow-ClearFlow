@@ -723,20 +723,25 @@
 
     <div class="ai-messages" id="ai-messages">
       <div class="chat-bubble bot">
-        👋 Hi! I'm <strong>FlowAI</strong>. I can help you check leave balances, generate salary slips, or answer HR policy questions. How can I assist you today?
+        👋 Hi! I'm <strong>FlowAI</strong>. Select one of the 12 approved questions below and I will provide the relevant answer from the HR database.
       </div>
     </div>
 
     <div class="ai-suggestions">
-      <span class="suggestion-pill" onclick="sendQuickAISuggestion('How many paid leaves do I have left?')">🌴 Leave Balance</span>
-      <span class="suggestion-pill" onclick="sendQuickAISuggestion('Show my salary breakdown')">💵 Salary Info</span>
-      <span class="suggestion-pill" onclick="sendQuickAISuggestion('Apply for leave tomorrow')">📝 Apply Leave</span>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('What is my current leave balance')">Leave balance</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('Show my salary breakdown')">Salary breakdown</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('What is my net salary')">Net salary</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('Can I view my payslip')">View payslip</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('What is my attendance status today')">Today's attendance</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('Can I apply for leave')">Apply for leave</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('How many pending leave requests are there')">Pending requests</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('Who is on leave today')">Who is on leave</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('How many employees are in the company')">Employee count</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('Who are the HR administrators')">HR administrators</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('What is my job title and department')">My role and department</button>
+      <button class="suggestion-pill" type="button" onclick="sendQuickAISuggestion('What are my contact details')">My contact details</button>
     </div>
 
-    <div class="ai-input-box">
-      <input type="text" id="ai-input" placeholder="Ask FlowAI anything..." onkeypress="handleAISubmit(event)">
-      <button class="btn btn-primary btn-sm" onclick="submitAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-    </div>
   </div>
 
   <!-- ==========================================================================
