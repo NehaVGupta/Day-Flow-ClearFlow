@@ -1,97 +1,910 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hackathon Project</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dayflow - Human Resource Management System (HRMS)</title>
+  <meta name="description" content="Dayflow HRMS - Modern, intelligent Human Resource Management System with role-based access, attendance tracking, leave workflows, and visual payroll.">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-    <nav>
-        <div class="logo">Hack<span>Hub</span></div>
+  <!-- ==========================================================================
+       HACKATHON CONTROL TOP BAR (Role Authentication & HR Controls)
+       ========================================================================== -->
+  <div class="judge-demo-bar">
+    <div class="judge-badge">
+      <span class="pulse-dot"></span>
+      <i class="fa-solid fa-shield-halved"></i> DAYFLOW HRMS CONTROL
+    </div>
+    
+    <div class="judge-role-selector">
+      <!-- HR Inspect View As Employee Selector (Visible to Admin) -->
+      <div id="hr-inspect-emp-select-box" style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="color: #94a3b8; font-size: 0.8rem; font-weight: 500;"><i class="fa-solid fa-eye"></i> HR View As:</span>
+        <select class="form-control" id="hr-inspect-emp-select" style="padding: 0.15rem 0.5rem; font-size: 0.75rem; border-radius: var(--radius-full); background: rgba(255,255,255,0.1); width: auto;" onchange="adminSwitchViewToEmployee(this.value)">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
 
-        <div class="nav-links">
-            <a href="#home">Home</a>
-            <a href="#features">Features</a>
-            <a href="#about">About</a>
+      <span style="color: #94a3b8; font-size: 0.8rem; font-weight: 500;">Role:</span>
+      <button class="judge-role-btn active" id="role-btn-admin" onclick="requestSwitchToHR()">
+        <i class="fa-solid fa-user-shield"></i> Admin / HR (Password Required)
+      </button>
+      <button class="judge-role-btn" id="role-btn-employee" onclick="adminSwitchViewToEmployee('EMP-4019')">
+        <i class="fa-solid fa-user-tie"></i> Employee (Alex Morgan)
+      </button>
+    </div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- ==========================================================================
+         SIDEBAR NAVIGATION
+         ========================================================================== -->
+    <aside class="sidebar">
+      <div class="brand-logo">
+        <div class="brand-icon">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div>
+          <div class="brand-title">Dayflow</div>
+          <div class="brand-tagline">Every Workday Aligned</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-section-title">Core Management</div>
+        
+        <a class="nav-item active" data-view="dashboard" onclick="navigateTo('dashboard')">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a class="nav-item" data-view="profile" onclick="navigateTo('profile')">
+          <i class="fa-solid fa-id-card"></i>
+          <span>My Profile</span>
+        </a>
+
+        <a class="nav-item" data-view="attendance" onclick="navigateTo('attendance')">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Attendance</span>
+        </a>
+
+        <a class="nav-item" data-view="leave" onclick="navigateTo('leave')">
+          <i class="fa-solid fa-calendar-check"></i>
+          <span>Leave Management</span>
+          <span class="nav-badge" id="sidebar-leave-badge">3</span>
+        </a>
+
+        <a class="nav-item" data-view="payroll" onclick="navigateTo('payroll')">
+          <i class="fa-solid fa-receipt"></i>
+          <span>Payroll & Salary</span>
+        </a>
+
+        <div class="nav-section-title">Insights & Reports</div>
+
+        <a class="nav-item" data-view="analytics" onclick="navigateTo('analytics')">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Analytics & Reports</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar User Profile Info -->
+      <div class="sidebar-user">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Avatar" class="user-avatar" id="sidebar-avatar">
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Sarah Connor</div>
+          <div class="user-role-badge" id="sidebar-user-role"><i class="fa-solid fa-shield"></i> HR Officer / Admin</div>
+        </div>
+        <button class="icon-btn" onclick="openAuthModal()" title="Switch Account / Sign In">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ==========================================================================
+         MAIN WORKSPACE AREA
+         ========================================================================== -->
+    <main class="main-wrapper">
+
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-title-box">
+          <h2 id="page-title">Executive Dashboard</h2>
+          <p id="page-subtitle">Real-time overview of workforce operations and metrics</p>
         </div>
 
-        <button onclick="showMessage()">Get Started</button>
-    </nav>
-
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <p class="tag">🚀 HACKATHON 2026</p>
-
-            <h1>
-                Build Ideas.<br>
-                <span>Make an Impact.</span>
-            </h1>
-
-            <p class="description">
-                A simple platform where innovative ideas become
-                real solutions through technology and teamwork.
-            </p>
-
-            <button class="hero-button" onclick="showMessage()">
-                Start Building →
+        <div class="header-actions">
+          <!-- Live Check-In Pill Widget -->
+          <div class="header-checkin-pill">
+            <span style="font-size: 0.8rem; color: #94a3b8;"><i class="fa-solid fa-business-time"></i> Shift Timer:</span>
+            <span class="checkin-timer" id="shift-clock">00:00:00</span>
+            <button class="btn-checkin" id="checkin-toggle-btn" onclick="toggleCheckIn()">
+              <i class="fa-solid fa-right-to-bracket"></i> Check In
             </button>
+          </div>
+
+          <!-- Notification Bell -->
+          <button class="icon-btn" onclick="toggleNotifications()" title="Notifications">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-dot"></span>
+          </button>
         </div>
-    </section>
+      </header>
 
-    <section class="features" id="features">
+      <!-- Content Body Container -->
+      <div class="content-body">
 
-        <h2>What We Offer</h2>
+        <!-- ====================================================================
+             1. DASHBOARD VIEW
+             ==================================================================== -->
+        <section id="view-dashboard" class="view-section active">
+          
+          <!-- ADMIN / HR DASHBOARD CONTAINER -->
+          <div id="admin-dashboard-content">
+            <div class="grid-4" style="margin-bottom: 1.5rem;">
+              <div class="glass-card stat-card">
+                <div class="stat-icon indigo"><i class="fa-solid fa-users"></i></div>
+                <div>
+                  <div class="stat-label">Total Workforce</div>
+                  <div class="stat-value" id="stat-total-emp">4</div>
+                  <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> +2 this month</div>
+                </div>
+              </div>
 
-        <div class="cards">
+              <div class="glass-card stat-card">
+                <div class="stat-icon emerald"><i class="fa-solid fa-user-check"></i></div>
+                <div>
+                  <div class="stat-label">On Duty Today</div>
+                  <div class="stat-value" id="stat-present-today">3</div>
+                  <div class="stat-change up"><i class="fa-solid fa-circle-check"></i> 75% attendance</div>
+                </div>
+              </div>
 
-            <div class="card">
-                <div class="icon">💡</div>
-                <h3>Innovative Ideas</h3>
-                <p>
-                    Turn creative ideas into practical solutions
-                    for real-world problems.
-                </p>
+              <div class="glass-card stat-card">
+                <div class="stat-icon amber"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div>
+                  <div class="stat-label">Pending Leave Approvals</div>
+                  <div class="stat-value" id="stat-pending-leaves">2</div>
+                  <div class="stat-change down"><i class="fa-solid fa-triangle-exclamation"></i> Requires HR Review</div>
+                </div>
+              </div>
+
+              <div class="glass-card stat-card">
+                <div class="stat-icon rose"><i class="fa-solid fa-wallet"></i></div>
+                <div>
+                  <div class="stat-label">Company Payroll</div>
+                  <div class="stat-value">$27,500</div>
+                  <div class="stat-change up"><i class="fa-solid fa-check-double"></i> Calculated accurately</div>
+                </div>
+              </div>
             </div>
 
-            <div class="card">
-                <div class="icon">🤝</div>
-                <h3>Teamwork</h3>
-                <p>
-                    Collaborate with your team and build something
-                    meaningful together.
-                </p>
+            <!-- Quick Approvals & Team Roster Grid -->
+            <div class="grid-2-1">
+              <div class="glass-card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-users-gear"></i> Company Employee Roster</div>
+                </div>
+                <div class="table-responsive">
+                  <table class="custom-table">
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>System Access</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="admin-employee-tbody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Pending Approvals Widget -->
+              <div class="glass-card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-user-clock"></i> HR Approval Queue</div>
+                  <span class="badge badge-pending" id="pending-count-badge">2 Pending</span>
+                </div>
+                <div id="admin-pending-leaves-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SINGLE EMPLOYEE DASHBOARD CONTAINER (ISOLATED TO LOGGED-IN EMPLOYEE) -->
+          <div id="employee-dashboard-content" style="display: none;">
+            
+            <!-- Employee Welcome Header -->
+            <div class="glass-card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.9) 100%); border-left: 4px solid var(--primary);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h3 style="font-size: 1.4rem; color: white;" id="emp-dash-welcome-name">Alex Morgan</h3>
+                  <p style="font-size: 0.85rem; color: #a5b4fc;" id="emp-dash-emp-id">ID: EMP-4019 | Senior Frontend Engineer</p>
+                </div>
+                <button class="btn btn-primary apply-leave-btn-trigger" onclick="openApplyLeaveModal()">
+                  <i class="fa-solid fa-paper-plane"></i> Apply for Time-Off
+                </button>
+              </div>
             </div>
 
-            <div class="card">
-                <div class="icon">⚡</div>
-                <h3>Fast Development</h3>
-                <p>
-                    Build, test and improve your project quickly
-                    during the hackathon.
-                </p>
+            <!-- Employee Core Tracks Overview (Attendance, Salary, Leave) -->
+            <div class="grid-3" style="margin-bottom: 1.5rem;">
+              
+              <!-- Track 1: Attendance Card -->
+              <div class="glass-card stat-card">
+                <div class="stat-icon emerald"><i class="fa-solid fa-user-clock"></i></div>
+                <div>
+                  <div class="stat-label">Days Present (This Month)</div>
+                  <div class="stat-value" id="emp-present-days-count">18 Days</div>
+                  <div class="stat-change up"><i class="fa-solid fa-circle-check"></i> Shift Clock Active</div>
+                </div>
+              </div>
+
+              <!-- Track 2: Leave Balances Card -->
+              <div class="glass-card stat-card">
+                <div class="stat-icon cyan"><i class="fa-solid fa-umbrella-beach"></i></div>
+                <div>
+                  <div class="stat-label">Paid Annual Leave</div>
+                  <div class="stat-value" id="emp-paid-leave-bal">10 Days</div>
+                  <div class="stat-change up"><i class="fa-solid fa-circle-info"></i> Sick: <span id="emp-sick-leave-bal">5</span> | Unpaid: <span id="emp-unpaid-leave-bal">0</span></div>
+                </div>
+              </div>
+
+              <!-- Track 3: Net Salary Card -->
+              <div class="glass-card stat-card">
+                <div class="stat-icon indigo"><i class="fa-solid fa-money-check-dollar"></i></div>
+                <div>
+                  <div class="stat-label">Net Payable Salary</div>
+                  <div class="stat-value" id="emp-net-salary-card">$7,850</div>
+                  <div class="stat-change up"><i class="fa-solid fa-calendar-day"></i> Next payout Aug 31</div>
+                </div>
+              </div>
             </div>
 
+            <!-- Employee Tables Grid: Attendance History & My Leave Applications -->
+            <div class="grid-2">
+              
+              <!-- My Attendance History -->
+              <div class="glass-card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> My Attendance Logs</div>
+                </div>
+                <div class="table-responsive">
+                  <table class="custom-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="emp-dashboard-attendance-tbody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- My Leave Applications -->
+              <div class="glass-card">
+                <div class="card-header">
+                  <div class="card-title"><i class="fa-solid fa-calendar-check"></i> My Leave Applications</div>
+                </div>
+                <div class="table-responsive">
+                  <table class="custom-table">
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th>Dates</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="emp-dashboard-leave-tbody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ====================================================================
+             2. EMPLOYEE PROFILE VIEW
+             ==================================================================== -->
+        <section id="view-profile" class="view-section">
+          <div class="grid-1-2">
+            <!-- Profile Summary Card -->
+            <div class="glass-card" style="text-align: center;">
+              <div style="position: relative; display: inline-block; margin-bottom: 1rem;">
+                <img src="" alt="Profile Picture" id="profile-card-avatar" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); box-shadow: var(--shadow-glow);">
+                <button class="btn btn-secondary btn-sm" style="position: absolute; bottom: 0; right: 0; border-radius: 50%; width: 34px; height: 34px; padding: 0; display: flex; align-items: center; justify-content: center;" onclick="openEditProfileModal()" title="Edit Picture">
+                  <i class="fa-solid fa-camera"></i>
+                </button>
+              </div>
+              <h3 id="profile-card-name">Sarah Connor</h3>
+              <p style="color: #a5b4fc; font-weight: 600; font-size: 0.9rem;" id="profile-card-title">Head of HR & Operations</p>
+              <div style="display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0;">
+                <span class="badge badge-approved" id="profile-card-emp-id">ID: HR-8842</span>
+                <span class="badge badge-half-day" id="profile-card-dept">HR Dept</span>
+              </div>
+              <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="openEditProfileModal()">
+                <i class="fa-solid fa-user-pen"></i> Edit Profile Details
+              </button>
+            </div>
+
+            <!-- Profile Details Tabs Container -->
+            <div class="glass-card">
+              <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+                <div style="display: flex; gap: 1rem;">
+                  <button class="btn btn-secondary btn-sm active" id="tab-btn-personal" onclick="switchProfileTab('personal')">Personal Details</button>
+                  <button class="btn btn-secondary btn-sm" id="tab-btn-job" onclick="switchProfileTab('job')">Job & Role</button>
+                  <button class="btn btn-secondary btn-sm" id="tab-btn-salary" onclick="switchProfileTab('salary')">Salary Structure</button>
+                  <button class="btn btn-secondary btn-sm" id="tab-btn-docs" onclick="switchProfileTab('docs')">Documents</button>
+                </div>
+              </div>
+
+              <!-- Personal Tab -->
+              <div id="profile-tab-personal" class="profile-tab-content">
+                <div class="grid-2" style="margin-top: 1rem;">
+                  <div>
+                    <span class="form-label">Full Name</span>
+                    <p style="font-weight: 600;" id="p-fullname">Sarah Connor</p>
+                  </div>
+                  <div>
+                    <span class="form-label">Email Address</span>
+                    <p style="font-weight: 600;" id="p-email">sarah.connor@dayflow.io</p>
+                  </div>
+                  <div>
+                    <span class="form-label">Phone Number</span>
+                    <p style="font-weight: 600;" id="p-phone">+1 (555) 234-8900</p>
+                  </div>
+                  <div>
+                    <span class="form-label">Residential Address</span>
+                    <p style="font-weight: 600;" id="p-address">742 Evergreen Terrace, Cyber City</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Job Tab -->
+              <div id="profile-tab-job" class="profile-tab-content" style="display: none;">
+                <div class="grid-2" style="margin-top: 1rem;">
+                  <div>
+                    <span class="form-label">Designation</span>
+                    <p style="font-weight: 600;" id="p-job-title">Head of HR & Operations</p>
+                  </div>
+                  <div>
+                    <span class="form-label">Department</span>
+                    <p style="font-weight: 600;" id="p-job-dept">Human Resources</p>
+                  </div>
+                  <div>
+                    <span class="form-label">Date of Joining</span>
+                    <p style="font-weight: 600;" id="p-job-doj">Jan 15, 2022</p>
+                  </div>
+                  <div>
+                    <span class="form-label">Employment Type</span>
+                    <p style="font-weight: 600; color: #34d399;">Full-Time Permanent</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Salary Tab -->
+              <div id="profile-tab-salary" class="profile-tab-content" style="display: none;">
+                <div class="grid-2" style="margin-top: 1rem;">
+                  <div>
+                    <span class="form-label">Annual CTC</span>
+                    <p style="font-weight: 700; font-size: 1.2rem; color: #38bdf8;" id="p-salary-ctc">$120,000 / year</p>
+                  </div>
+                  <div>
+                    <span class="form-label">Monthly Base Pay</span>
+                    <p style="font-weight: 600;" id="p-salary-base">$6,500</p>
+                  </div>
+                  <div>
+                    <span class="form-label">HRA & Allowances</span>
+                    <p style="font-weight: 600;" id="p-salary-hra">$2,300</p>
+                  </div>
+                  <div>
+                    <span class="form-label">Deductions (PF / Tax)</span>
+                    <p style="font-weight: 600; color: #f87171;" id="p-salary-deductions">$950</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Documents Tab -->
+              <div id="profile-tab-docs" class="profile-tab-content" style="display: none;">
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: rgba(0,0,0,0.2); border-radius: var(--radius-md);">
+                    <div>
+                      <i class="fa-solid fa-file-pdf" style="color: #ef4444; margin-right: 0.5rem;"></i> Employment_Contract_Dayflow.pdf
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="showToast('Downloading Employment Contract...', 'info')"><i class="fa-solid fa-download"></i> Download</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             3. ATTENDANCE MANAGEMENT VIEW
+             ==================================================================== -->
+        <section id="view-attendance" class="view-section">
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-calendar-days"></i> Attendance Tracking Logs</div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Employee</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Total Hours</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="attendance-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             4. LEAVE MANAGEMENT VIEW
+             ==================================================================== -->
+        <section id="view-leave" class="view-section">
+          <div class="filter-bar">
+            <h3 style="font-size: 1.2rem;">Leave & Time-Off Center</h3>
+            <button class="btn btn-primary apply-leave-btn-trigger" onclick="openApplyLeaveModal()">
+              <i class="fa-solid fa-plus"></i> Apply for Time-Off
+            </button>
+          </div>
+
+          <!-- Leave Requests Table Container -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-list-check"></i> Leave Applications & Approval Workflow</div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Applicant</th>
+                    <th>Leave Type</th>
+                    <th>Date Range</th>
+                    <th>Duration</th>
+                    <th>Reason / Remarks</th>
+                    <th>Status</th>
+                    <th>HR Actions / Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="leave-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             5. PAYROLL & SALARY MANAGEMENT VIEW
+             ==================================================================== -->
+        <section id="view-payroll" class="view-section">
+          <div class="filter-bar">
+            <h3 style="font-size: 1.2rem;">Payroll & Salary Structure</h3>
+            <button class="btn btn-primary" onclick="openPaySlipModal()">
+              <i class="fa-solid fa-file-pdf"></i> Generate & Print Payslip
+            </button>
+          </div>
+
+          <div class="grid-2-1" style="margin-bottom: 1.5rem;">
+            <!-- Breakdown Card -->
+            <div class="glass-card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-receipt"></i> Salary Structure Breakdown</div>
+                <span class="badge badge-approved">Pay Period: August 2026</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 1rem;" id="payroll-breakdown-list">
+                <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                  <span>Basic Salary</span>
+                  <span style="font-weight: 700; color: #f8fafc;" id="pay-basic">$5,500.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                  <span>House Rent Allowance (HRA)</span>
+                  <span style="font-weight: 700; color: #f8fafc;" id="pay-hra">$1,800.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                  <span>Special Allowance</span>
+                  <span style="font-weight: 700; color: #f8fafc;" id="pay-allowance">$1,200.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                  <span style="color: #f87171;">Provident Fund & Tax Deductions</span>
+                  <span style="font-weight: 700; color: #f87171;" id="pay-deductions">-$650.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; font-size: 1.1rem; border-top: 2px solid var(--primary);">
+                  <span style="font-weight: 800;">Net Payable Salary</span>
+                  <span style="font-weight: 800; color: #34d399;" id="pay-net">$7,850.00</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Salary Stats & Direct Deposit -->
+            <div class="glass-card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-building-columns"></i> Payment Details</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                  <span class="form-label">Bank Name</span>
+                  <p style="font-weight: 600;">Chase Business Bank</p>
+                </div>
+                <div>
+                  <span class="form-label">Account Number</span>
+                  <p style="font-weight: 600;">**** **** 8942</p>
+                </div>
+                <div>
+                  <span class="form-label">Payout Date</span>
+                  <p style="font-weight: 600; color: #34d399;">August 31, 2026 (Scheduled)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HR Admin Payroll Control Table (Visible to Admin) -->
+          <div class="glass-card" id="admin-payroll-control-card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-sliders"></i> Global Employee Payroll Control (Admin)</div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Basic Pay</th>
+                    <th>Allowances</th>
+                    <th>Deductions</th>
+                    <th>Net Pay</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-payroll-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             6. ANALYTICS & REPORTS VIEW
+             ==================================================================== -->
+        <section id="view-analytics" class="view-section">
+          <div class="grid-2" style="margin-bottom: 1.5rem;">
+            <!-- Weekly Attendance Chart -->
+            <div class="glass-card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-chart-column"></i> Weekly Attendance Trends (%)</div>
+              </div>
+              <canvas id="chart-attendance" height="220"></canvas>
+            </div>
+
+            <!-- Department Salary Distribution -->
+            <div class="glass-card">
+              <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-chart-pie"></i> Salary Expenditure by Department</div>
+              </div>
+              <canvas id="chart-salary" height="220"></canvas>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       FLOWAI HR ASSISTANT DRAWER
+       ========================================================================== -->
+  <button class="ai-copilot-trigger" onclick="toggleAIDrawer()" title="Ask FlowAI HR Copilot">
+    <i class="fa-solid fa-wand-magic-sparkles"></i>
+  </button>
+
+  <div class="ai-drawer" id="ai-drawer">
+    <div class="ai-header">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-robot" style="color: #a855f7; font-size: 1.2rem;"></i>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem;">FlowAI Assistant</div>
+          <div style="font-size: 0.7rem; color: #a5b4fc;">Predictive HR & Policy Copilot</div>
         </div>
-    </section>
+      </div>
+      <button class="modal-close" onclick="toggleAIDrawer()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
 
-    <section class="about" id="about">
-        <h2>Our Mission</h2>
+    <div class="ai-messages" id="ai-messages">
+      <div class="chat-bubble bot">
+        👋 Hi! I'm <strong>FlowAI</strong>. I can help you check leave balances, generate salary slips, or answer HR policy questions. How can I assist you today?
+      </div>
+    </div>
 
-        <p>
-            We believe technology can help solve everyday problems.
-            Our goal is to transform ideas into simple, useful and
-            impactful digital solutions.
-        </p>
-    </section>
+    <div class="ai-suggestions">
+      <span class="suggestion-pill" onclick="sendQuickAISuggestion('How many paid leaves do I have left?')">🌴 Leave Balance</span>
+      <span class="suggestion-pill" onclick="sendQuickAISuggestion('Show my salary breakdown')">💵 Salary Info</span>
+      <span class="suggestion-pill" onclick="sendQuickAISuggestion('Apply for leave tomorrow')">📝 Apply Leave</span>
+    </div>
 
-    <footer>
-        <p>© 2026 HackHub | Built for Hackathon</p>
-    </footer>
+    <div class="ai-input-box">
+      <input type="text" id="ai-input" placeholder="Ask FlowAI anything..." onkeypress="handleAISubmit(event)">
+      <button class="btn btn-primary btn-sm" onclick="submitAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
 
-    <script src="script.js"></script>
+  <!-- ==========================================================================
+       MODALS
+       ========================================================================== -->
 
+  <!-- 1. HR AUTH PASSWORD PROMPT MODAL (Password admin@123 required) -->
+  <div class="modal-overlay" id="modal-hr-auth-prompt">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="card-title"><i class="fa-solid fa-user-shield" style="color:#a855f7;"></i> HR Admin Authentication</h3>
+        <button class="modal-close" onclick="closeModal('modal-hr-auth-prompt')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;" id="hr-auth-msg">
+        Enter HR Admin password to access the administrative dashboard.
+      </p>
+
+      <div id="hr-auth-error" style="display: none; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; padding: 0.65rem; border-radius: var(--radius-md); font-size: 0.8rem; margin-bottom: 1rem;"></div>
+
+      <form onsubmit="submitHRAuthPrompt(event)">
+        <div class="form-group">
+          <label class="form-label">HR Admin Password</label>
+          <input type="password" class="form-control" id="hr-auth-password-input" placeholder="Enter HR password..." required autofocus>
+          <span style="font-size: 0.75rem; color: #a5b4fc; display: block; margin-top: 0.35rem;">* Hint: HR Password is <strong>admin@123</strong></span>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fa-solid fa-key"></i> Authenticate HR Admin</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. APPLY LEAVE MODAL (Available to Employees) -->
+  <div class="modal-overlay" id="modal-apply-leave">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="card-title"><i class="fa-solid fa-calendar-plus"></i> Request Time-Off / Leave</h3>
+        <button class="modal-close" onclick="closeModal('modal-apply-leave')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="form-apply-leave" onsubmit="handleLeaveSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Leave Type</label>
+          <select class="form-control" id="leave-type-select" required>
+            <option value="Paid Leave">Paid Annual Leave</option>
+            <option value="Sick Leave">Sick Leave</option>
+            <option value="Unpaid Leave">Unpaid Leave</option>
+          </select>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-control" id="leave-start-date" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Date</label>
+            <input type="date" class="form-control" id="leave-end-date" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Remarks / Reason</label>
+          <textarea class="form-control" id="leave-reason" rows="3" placeholder="Provide context for HR review..." required></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-apply-leave')">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. PAYSLIP GENERATOR & PRINT MODAL -->
+  <div class="modal-overlay" id="modal-payslip">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 class="card-title"><i class="fa-solid fa-file-invoice-dollar"></i> Official Salary Payslip</h3>
+        <button class="modal-close" onclick="closeModal('modal-payslip')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="payslip-container" style="background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 2px solid var(--primary); padding-bottom: 1rem; margin-bottom: 1rem;">
+          <div>
+            <h2 style="color: white; font-size: 1.4rem;">DAYFLOW INC.</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">100 Tech Plaza, Silicon Valley, CA</p>
+          </div>
+          <div style="text-align: right;">
+            <h4 style="color: #38bdf8;">PAYSLIP STATEMENT</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted);" id="ps-period">August 2026</p>
+          </div>
+        </div>
+
+        <div class="grid-2" style="font-size: 0.85rem; margin-bottom: 1rem;">
+          <div>
+            <p><strong>Employee Name:</strong> <span id="ps-name">Alex Morgan</span></p>
+            <p><strong>Employee ID:</strong> <span id="ps-id">EMP-4019</span></p>
+            <p><strong>Designation:</strong> <span id="ps-title">Senior Developer</span></p>
+          </div>
+          <div>
+            <p><strong>Bank Account:</strong> Chase Bank (****8942)</p>
+            <p><strong>Pay Date:</strong> Aug 31, 2026</p>
+            <p><strong>Status:</strong> <span style="color: #34d399; font-weight: 700;">PROCESSED</span></p>
+          </div>
+        </div>
+
+        <table class="custom-table" style="margin-bottom: 1rem;">
+          <thead>
+            <tr><th>Earnings</th><th>Amount</th><th>Deductions</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Basic Pay</td><td id="ps-basic">$5,500.00</td><td>Provident Fund</td><td>$350.00</td></tr>
+            <tr><td>HRA Allowance</td><td id="ps-hra">$1,800.00</td><td>Income Tax (TDS)</td><td>$300.00</td></tr>
+            <tr><td>Special Allowance</td><td id="ps-allowance">$1,200.00</td><td>Insurance</td><td>$0.00</td></tr>
+            <tr style="font-weight: 700; background: rgba(99,102,241,0.15);">
+              <td>Gross Salary</td><td id="ps-gross">$8,500.00</td>
+              <td>Total Deductions</td><td id="ps-total-deductions">-$650.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(16,185,129,0.15); padding: 1rem; border-radius: var(--radius-md); border: 1px solid rgba(16,185,129,0.3);">
+          <span style="font-size: 1.1rem; font-weight: 800;">NET SALARY PAYABLE:</span>
+          <span style="font-size: 1.4rem; font-weight: 800; color: #34d399;" id="ps-net">$7,850.00</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+        <button class="btn btn-secondary" onclick="closeModal('modal-payslip')">Close</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print / Save PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. EDIT PROFILE MODAL -->
+  <div class="modal-overlay" id="modal-edit-profile">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="card-title"><i class="fa-solid fa-user-pen"></i> Edit Profile Information</h3>
+        <button class="modal-close" onclick="closeModal('modal-edit-profile')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="form-edit-profile" onsubmit="handleProfileSave(event)">
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="text" class="form-control" id="edit-phone">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Residential Address</label>
+          <input type="text" class="form-control" id="edit-address">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Profile Picture URL</label>
+          <input type="url" class="form-control" id="edit-avatar">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit-profile')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. AUTHENTICATION SIGN IN / SIGN UP MODAL -->
+  <div class="modal-overlay" id="modal-auth">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="card-title"><i class="fa-solid fa-lock"></i> Dayflow System Portal Sign In</h3>
+        <button class="modal-close" onclick="closeModal('modal-auth')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <button class="btn btn-secondary btn-sm active" style="flex: 1;" id="auth-tab-signin" onclick="switchAuthTab('signin')">Sign In</button>
+        <button class="btn btn-secondary btn-sm" style="flex: 1;" id="auth-tab-signup" onclick="switchAuthTab('signup')">Register Employee</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="form-auth-signin" onsubmit="handleSignInSubmit(event)">
+        <div id="signin-error-box" style="display: none; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+        <div class="form-group">
+          <label class="form-label">Select Account Category</label>
+          <select class="form-control" id="signin-role-select">
+            <option value="admin">HR Admin (Sarah Connor)</option>
+            <option value="employee" selected>Employee (Alex Morgan)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Work Email</label>
+          <input type="email" class="form-control" id="signin-email" placeholder="user@dayflow.io" required value="alex.morgan@dayflow.io">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="signin-password" placeholder="••••••••" required value="Employee@123">
+          <span style="font-size: 0.75rem; color: #a5b4fc; margin-top: 0.25rem; display: block;">* Note: HR Password is <strong>admin@123</strong></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In to Portal</button>
+      </form>
+
+      <!-- Sign Up Form (With Password Rules) -->
+      <form id="form-auth-signup" onsubmit="handleSignUpSubmit(event)" style="display: none;">
+        <div id="signup-error-box" style="display: none; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+        <div class="form-group">
+          <label class="form-label">Employee ID</label>
+          <input type="text" class="form-control" id="signup-empid" placeholder="e.g. EMP-9921" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="signup-name" placeholder="John Doe" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Work Email</label>
+          <input type="email" class="form-control" id="signup-email" placeholder="john.doe@dayflow.io" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Role Category</label>
+          <select class="form-control" id="signup-role" required>
+            <option value="employee">Regular Employee</option>
+            <option value="admin">HR Officer / Admin</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="signup-password" placeholder="e.g. Password@123" required>
+          <span style="font-size: 0.725rem; color: #a5b4fc; margin-top: 0.35rem; display: block;">
+            🔒 Security Rules: Min 8 chars, 1 uppercase (A-Z), 1 number (0-9), & 1 special character (!@#$%^&*).
+          </span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Register Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="app.js"></script>
+  <script src="analytics.js"></script>
+  <script src="ai-copilot.js"></script>
 </body>
 </html>
