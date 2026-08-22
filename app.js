@@ -182,7 +182,9 @@ const SEED_DATA = {
   leaveRequests: [
     { id: 1, applicant: 'Marcus Vance', empId: 'EMP-6320', type: 'Paid Leave', start: '2026-08-22', end: '2026-08-25', duration: '4 Days', reason: 'Family vacation & medical rest', status: 'Approved', comment: 'Approved by HR' },
     { id: 2, applicant: 'Alex Morgan', empId: 'EMP-4019', type: 'Sick Leave', start: '2026-08-28', end: '2026-08-29', duration: '2 Days', reason: 'Dental surgery follow-up', status: 'Pending', comment: '' },
-    { id: 3, applicant: 'Elena Rostova', empId: 'EMP-5102', type: 'Paid Leave', start: '2026-09-02', end: '2026-09-04', duration: '3 Days', reason: 'Design conference attendance', status: 'Pending', comment: '' }
+    { id: 3, applicant: 'Elena Rostova', empId: 'EMP-5102', type: 'Paid Leave', start: '2026-09-02', end: '2026-09-04', duration: '3 Days', reason: 'Design conference attendance', status: 'Pending', comment: '' },
+    { id: 4, applicant: 'Priya Shah', empId: 'EMP-7441', type: 'Paid Leave', start: '2026-09-10', end: '2026-09-12', duration: '3 Days', reason: 'Personal travel plans', status: 'Pending', comment: '' },
+    { id: 5, applicant: 'Jordan Lee', empId: 'EMP-8563', type: 'Sick Leave', start: '2026-08-26', end: '2026-08-27', duration: '2 Days', reason: 'Medical appointment and recovery', status: 'Pending', comment: '' }
   ]
 };
 
@@ -378,10 +380,12 @@ function loadState() {
   if (saved) {
     appState = JSON.parse(saved);
     syncSeedUsers();
+    syncSeedLeaveRequests();
     syncEmployeeAttendanceData();
     saveState();
   } else {
     appState = SEED_DATA;
+    syncSeedLeaveRequests();
     syncEmployeeAttendanceData();
     saveState();
   }
@@ -391,6 +395,12 @@ function syncSeedUsers() {
   const existingIds = new Set(appState.users.map(user => user.id));
   const missingUsers = SEED_DATA.users.filter(user => !existingIds.has(user.id));
   appState.users.push(...missingUsers);
+}
+
+function syncSeedLeaveRequests() {
+  const existingIds = new Set(appState.leaveRequests.map(request => request.id));
+  const missingRequests = SEED_DATA.leaveRequests.filter(request => !existingIds.has(request.id));
+  appState.leaveRequests.push(...missingRequests);
 }
 
 function syncEmployeeAttendanceData() {

@@ -686,7 +686,6 @@
                 <div class="card-title"><i class="fa-solid fa-chart-column"></i> Weekly Attendance Trends (%)</div>
               </div>
               <canvas id="chart-attendance" height="220"></canvas>
-              <div class="analytics-detail" id="attendance-analysis" hidden></div>
             </div>
 
             <!-- Department Salary Distribution -->
@@ -695,7 +694,6 @@
                 <div class="card-title"><i class="fa-solid fa-chart-pie"></i> Salary Expenditure by Department</div>
               </div>
               <canvas id="chart-salary" height="220"></canvas>
-              <div class="analytics-detail" id="salary-analysis" hidden></div>
             </div>
           </div>
         </section>
@@ -912,7 +910,7 @@
         <h3 class="card-title"><i class="fa-solid fa-key"></i> Change Your Password</h3>
         <button class="modal-close" onclick="closeModal('modal-change-password')"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <p class="password-modal-copy" id="password-otp-message">A one-time verification code will be sent to your registered email.</p>
+      <p class="password-modal-copy" id="password-otp-message">We will send a one-time verification code to your registered email.</p>
       <div class="portal-form-error" id="password-change-error"></div>
       <form id="form-change-password" onsubmit="handlePasswordChange(event)">
         <div class="form-group">
@@ -943,7 +941,7 @@
         <button class="modal-close" onclick="closeModal('modal-auth')"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div class="auth-modal-tabs" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
         <button class="btn btn-secondary btn-sm active" style="flex: 1;" id="auth-tab-signin" onclick="switchAuthTab('signin')">Sign In</button>
         <button class="btn btn-secondary btn-sm" style="flex: 1;" id="auth-tab-signup" onclick="switchAuthTab('signup')">Register Employee</button>
       </div>
@@ -984,7 +982,7 @@
 
         <div class="form-group">
           <label class="form-label">Full Name</label>
-          <input type="text" class="form-control" id="signup-name" placeholder="John Doe" oninput="updateSignupPassword()" required>
+          <input type="text" class="form-control" id="signup-name" placeholder="John Doe" required>
         </div>
 
         <div class="form-group">
@@ -994,7 +992,7 @@
 
         <div class="form-group">
           <label class="form-label">Role Category</label>
-          <select class="form-control" id="signup-role" onchange="updateSignupPassword()" required>
+          <select class="form-control" id="signup-role" required>
             <option value="employee">Regular Employee</option>
             <option value="admin">HR Officer / Admin</option>
           </select>

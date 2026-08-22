@@ -409,18 +409,48 @@ button, input, select, textarea {
   font-weight: 500;
 }
 
+#hr-inspect-emp-select-box > span {
+  color: #d7e9f7 !important;
+}
+
+#hr-inspect-emp-select {
+  color: #ffffff !important;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+#hr-inspect-emp-select option {
+  background: #ffffff;
+  color: #172b4d;
+  font-weight: 600;
+}
+
+#hr-inspect-emp-select option:checked,
+#hr-inspect-emp-select option:hover {
+  background: #dbeeff;
+  color: #172b4d;
+}
+
 .judge-role-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 0.25rem 0.85rem;
   border-radius: var(--radius-full);
-  color: var(--text-muted);
+  color: #d7e9f7;
   cursor: pointer;
   font-weight: 600;
   transition: var(--transition-fast);
   display: flex;
   align-items: center;
   gap: 0.4rem;
+}
+
+#role-btn-employee {
+  color: #d7e9f7;
+}
+
+#role-btn-employee i {
+  color: #b9d8ea;
 }
 
 .judge-role-btn.active {
@@ -1007,147 +1037,6 @@ button, input, select, textarea {
 
 #view-payroll .custom-table td {
   color: #334155;
-}
-
-.analytics-detail {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #dbe5ef;
-  animation: fadeIn 0.25s ease;
-}
-
-.analytics-detail[hidden] {
-  display: none;
-}
-
-.analytics-detail-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.9rem;
-}
-
-.analytics-detail-header h4 {
-  color: #172b4d;
-  font-size: 1rem;
-}
-
-.analytics-detail-header p,
-.analytics-empty {
-  color: #536176;
-  font-size: 0.75rem;
-  margin-top: 0.2rem;
-}
-
-.analytics-detail-close {
-  width: 26px;
-  height: 26px;
-  border: 1px solid #c8d8e6;
-  border-radius: 50%;
-  background: #f8fbff;
-  color: #536176;
-  font-size: 1.1rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.analytics-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.5rem;
-  margin-bottom: 0.9rem;
-}
-
-.analytics-summary-grid > div {
-  padding: 0.55rem;
-  border: 1px solid #e2e8f0;
-  border-radius: var(--radius-sm);
-  background: #f8fbff;
-}
-
-.analytics-summary-grid strong,
-.analytics-summary-grid span {
-  display: block;
-}
-
-.analytics-summary-grid strong {
-  color: #172b4d;
-  font-size: 0.95rem;
-}
-
-.analytics-summary-grid span {
-  color: #536176;
-  font-size: 0.65rem;
-  line-height: 1.2;
-  margin-top: 0.15rem;
-}
-
-.analytics-lists-grid,
-.analytics-salary-grid {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.analytics-lists-grid details,
-.analytics-salary-grid details {
-  border: 1px solid #e2e8f0;
-  border-radius: var(--radius-sm);
-  background: #ffffff;
-}
-
-.analytics-lists-grid summary,
-.analytics-salary-grid summary {
-  padding: 0.55rem 0.65rem;
-  color: #172b4d;
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.analytics-employee-list {
-  padding: 0 0.65rem 0.55rem;
-}
-
-.analytics-employee-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.15rem 0.5rem;
-  padding: 0.45rem 0;
-  border-top: 1px solid #edf1f5;
-}
-
-.analytics-employee-row strong {
-  color: #172b4d;
-  font-size: 0.72rem;
-}
-
-.analytics-employee-row span {
-  color: #536176;
-  font-size: 0.65rem;
-}
-
-.analytics-employee-row span:last-child {
-  grid-column: 1 / -1;
-}
-
-#chart-attendance,
-#chart-salary {
-  cursor: pointer;
-}
-
-@media (max-width: 600px) {
-  .analytics-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .analytics-employee-row {
-    grid-template-columns: 1fr;
-  }
-
-  .analytics-employee-row span:last-child {
-    grid-column: auto;
-  }
 }
 
 /* Buttons */
