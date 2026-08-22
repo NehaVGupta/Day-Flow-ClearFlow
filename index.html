@@ -20,7 +20,7 @@
   <div class="judge-demo-bar">
     <div class="judge-badge">
       <span class="pulse-dot"></span>
-      <i class="fa-solid fa-shield-halved"></i> DAYFLOW HRMS CONTROL
+      <i class="fa-solid fa-layer-group"></i> DAYFLOW WORKSPACE
     </div>
     
     <div class="judge-role-selector">
@@ -32,12 +32,12 @@
         </select>
       </div>
 
-      <span style="color: #94a3b8; font-size: 0.8rem; font-weight: 500;">Role:</span>
+      <span class="portal-switch-label">Open portal:</span>
       <button class="judge-role-btn active" id="role-btn-admin" onclick="requestSwitchToHR()">
-        <i class="fa-solid fa-user-shield"></i> Admin / HR (Password Required)
+        <i class="fa-solid fa-user-shield"></i> Admin & HR
       </button>
       <button class="judge-role-btn" id="role-btn-employee" onclick="adminSwitchViewToEmployee('EMP-4019')">
-        <i class="fa-solid fa-user-tie"></i> Employee (Alex Morgan)
+        <i class="fa-solid fa-user-tie"></i> Employee
       </button>
     </div>
   </div>
@@ -58,8 +58,14 @@
         </div>
       </div>
 
+      <div class="portal-identity" id="portal-identity">
+        <span class="portal-kicker">Current portal</span>
+        <strong id="portal-name">Admin & HR Portal</strong>
+        <span id="portal-description">People operations command center</span>
+      </div>
+
       <nav class="nav-menu">
-        <div class="nav-section-title">Core Management</div>
+        <div class="nav-section-title" id="core-nav-label">People operations</div>
         
         <a class="nav-item active" data-view="dashboard" onclick="navigateTo('dashboard')">
           <i class="fa-solid fa-chart-pie"></i>
@@ -87,9 +93,9 @@
           <span>Payroll & Salary</span>
         </a>
 
-        <div class="nav-section-title">Insights & Reports</div>
+        <div class="nav-section-title" id="insights-nav-label">Insights & reports</div>
 
-        <a class="nav-item" data-view="analytics" onclick="navigateTo('analytics')">
+        <a class="nav-item admin-only-nav" data-view="analytics" onclick="navigateTo('analytics')">
           <i class="fa-solid fa-chart-line"></i>
           <span>Analytics & Reports</span>
         </a>

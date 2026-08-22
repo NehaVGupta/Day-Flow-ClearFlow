@@ -194,6 +194,9 @@ function updateRoleUI() {
   const role = appState.activeRoleId;
   const isHr = role === 'admin';
 
+  document.body.classList.toggle('employee-portal', !isHr);
+  document.body.classList.toggle('hr-portal', isHr);
+
   document.getElementById('role-btn-admin').classList.toggle('active', isHr);
   document.getElementById('role-btn-employee').classList.toggle('active', !isHr);
 
@@ -202,6 +205,20 @@ function updateRoleUI() {
   if (hrEmpSelectBox) {
     hrEmpSelectBox.style.display = isHr ? 'flex' : 'none';
   }
+
+  const portalName = document.getElementById('portal-name');
+  const portalDescription = document.getElementById('portal-description');
+  const coreNavLabel = document.getElementById('core-nav-label');
+  const insightsNavLabel = document.getElementById('insights-nav-label');
+  if (portalName) portalName.innerText = isHr ? 'Admin & HR Portal' : 'Employee Portal';
+  if (portalDescription) portalDescription.innerText = isHr
+    ? 'People operations command center'
+    : 'Your personal workday workspace';
+  if (coreNavLabel) coreNavLabel.innerText = isHr ? 'People operations' : 'My workday';
+  if (insightsNavLabel) insightsNavLabel.innerText = isHr ? 'Insights & reports' : 'My records';
+  document.querySelectorAll('.admin-only-nav').forEach(item => {
+    item.style.display = isHr ? 'flex' : 'none';
+  });
 }
 
 // Password Security Validation Rule
@@ -319,8 +336,9 @@ function navigateTo(viewId) {
   const target = document.getElementById(`view-${viewId}`);
   if (target) target.classList.add('active');
 
+  const isHr = appState.activeRoleId === 'admin';
   const titles = {
-    dashboard: 'Executive Dashboard',
+    dashboard: isHr ? 'Executive Dashboard' : 'My Workday',
     profile: 'Employee Profile Management',
     attendance: 'Attendance Tracking & Time Logs',
     leave: 'Leave & Time-Off Center',
@@ -335,6 +353,7 @@ function navigateTo(viewId) {
 }
 
 function initUI() {
+  updateRoleUI();
   renderUserContext();
   renderDashboardView();
   renderProfileView();
@@ -355,6 +374,10 @@ function renderUserContext() {
 
   // Header Subtitle
   const sub = document.getElementById('page-subtitle');
+  const pageTitle = document.getElementById('page-title');
+  if (pageTitle && document.getElementById('view-dashboard').classList.contains('active')) {
+    pageTitle.innerText = isHr ? 'Executive Dashboard' : 'My Workday';
+  }
   if (sub) {
     sub.innerText = isHr 
       ? 'Real-time overview of company HR operations & leave approvals' 
