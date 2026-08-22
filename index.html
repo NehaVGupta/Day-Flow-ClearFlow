@@ -982,7 +982,7 @@
 
         <div class="form-group">
           <label class="form-label">Full Name</label>
-          <input type="text" class="form-control" id="signup-name" placeholder="John Doe" required>
+          <input type="text" class="form-control" id="signup-name" placeholder="John Doe" oninput="updateSignupPassword()" required>
         </div>
 
         <div class="form-group">
@@ -992,7 +992,7 @@
 
         <div class="form-group">
           <label class="form-label">Role Category</label>
-          <select class="form-control" id="signup-role" required>
+          <select class="form-control" id="signup-role" onchange="updateSignupPassword()" required>
             <option value="employee">Regular Employee</option>
             <option value="admin">HR Officer / Admin</option>
           </select>

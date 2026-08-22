@@ -9,13 +9,19 @@
   5. Account password format: first four email characters plus '@123'.
    ========================================================================== */
 
-function getDefaultPassword(email) {
+function getEmployeeDefaultPassword(email) {
   const emailName = email.toLowerCase().split('@')[0];
   return `${emailName.slice(0, 4)}@123`;
 }
 
+function getHRDefaultPassword(name) {
+  return `${name.trim().slice(0, 3).toLowerCase()}@123`;
+}
+
 function getUserPassword(user) {
-  return user.password || getDefaultPassword(user.email);
+  return user.role === 'admin'
+    ? getHRDefaultPassword(user.name)
+    : user.password || getEmployeeDefaultPassword(user.email);
 }
 
 // Seed Database
@@ -493,7 +499,7 @@ function submitHRAuthPrompt(e) {
     closeModal('modal-hr-auth-prompt');
 
     appState.activeRoleId = 'admin';
-    currentAuthUser = appState.users.find(u => u.role === 'admin');
+    currentAuthUser = hrUser;
     appState.activeAdminId = currentAuthUser.id;
     isHrInspectingEmployee = false;
     saveState();
@@ -597,7 +603,7 @@ function handleSignUpSubmit(e) {
   const name = document.getElementById('signup-name').value.trim();
   const email = document.getElementById('signup-email').value.trim();
   const role = document.getElementById('signup-role').value;
-  const password = getDefaultPassword(email);
+  const password = role === 'admin' ? getHRDefaultPassword(name) : getEmployeeDefaultPassword(email);
   const errBox = document.getElementById('signup-error-box');
 
   errBox.style.display = 'none';
@@ -1246,7 +1252,12 @@ function openAddEmployeeModal() {
 function updateSignupPassword() {
   const email = document.getElementById('signup-email');
   const password = document.getElementById('signup-password');
-  if (email && password) password.value = getDefaultPassword(email.value.trim());
+  const name = document.getElementById('signup-name');
+  const role = document.getElementById('signup-role');
+  if (!email || !password || !name || !role) return;
+  password.value = role.value === 'admin'
+    ? getHRDefaultPassword(name.value)
+    : getEmployeeDefaultPassword(email.value.trim());
 }
 
 function switchAuthTab(type) {
