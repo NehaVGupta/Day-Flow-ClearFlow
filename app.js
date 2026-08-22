@@ -142,10 +142,21 @@ let isCheckedIn = false;
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
+  renderEmployeeAccountOptions();
   initAuthSession();
   initUI();
   startShiftTimer();
 });
+
+function renderEmployeeAccountOptions() {
+  const accountSelect = document.getElementById('employee-portal-email');
+  if (!accountSelect || !appState.users) return;
+
+  const employees = appState.users.filter(user => user.role === 'employee');
+  accountSelect.innerHTML = employees.map(employee => `
+    <option value="${employee.email}">${employee.name} - ${employee.email}</option>
+  `).join('');
+}
 
 function handlePortalLogin(e, role) {
   e.preventDefault();
@@ -406,6 +417,7 @@ function handleSignUpSubmit(e) {
   };
 
   appState.users.push(newUser);
+  renderEmployeeAccountOptions();
   appState.activeRoleId = role;
   if (role === 'employee') appState.viewAsEmpId = empId;
   currentAuthUser = newUser;

@@ -52,8 +52,10 @@
           <p>Track your workday, leave, attendance, profile, and salary.</p>
         </div>
         <div class="portal-form-error" id="employee-portal-error"></div>
-        <label class="form-label" for="employee-portal-email">Work email</label>
-        <input class="form-control" id="employee-portal-email" type="email" value="alex.morgan@dayflow.io" placeholder="you@dayflow.io" required>
+        <label class="form-label" for="employee-portal-email">Choose employee account</label>
+        <select class="form-control employee-account-select" id="employee-portal-email" size="4" required aria-label="Choose an employee account">
+          <!-- Populated from employee profiles -->
+        </select>
         <label class="form-label" for="employee-portal-password">Password</label>
         <input class="form-control" id="employee-portal-password" type="password" placeholder="Enter your password" required>
         <button class="btn btn-employee portal-login-button" type="submit"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign in to Employee Portal</button>

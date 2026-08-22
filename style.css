@@ -191,6 +191,23 @@ body:not(.portal-session) #toast-container {
 
 .portal-login-card .form-label { margin-top: 0.35rem; }
 
+.employee-account-select {
+  min-height: 7rem;
+  padding: 0.35rem;
+  overflow-y: auto;
+}
+
+.employee-account-select option {
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+}
+
+.employee-account-select option:checked {
+  background: rgba(6, 182, 212, 0.25);
+  color: #a5f3fc;
+}
+
 .portal-login-button {
   width: 100%;
   margin-top: 1rem;
