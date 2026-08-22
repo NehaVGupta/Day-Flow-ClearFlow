@@ -336,6 +336,23 @@ function showWorkspaceAfterLogin() {
   window.scrollTo(0, 0);
 }
 
+function returnToPortalEntry() {
+  const portalEntryScreen = document.getElementById('portal-entry-screen');
+  if (portalEntryScreen) {
+    portalEntryScreen.removeAttribute('aria-hidden');
+    portalEntryScreen.style.display = 'flex';
+  }
+
+  document.body.classList.remove('portal-session', 'hr-inspecting-employee', 'employee-portal', 'hr-portal');
+  isHrInspectingEmployee = false;
+  passwordChangeOtp = null;
+  closeModal('modal-change-password');
+  closeModal('modal-auth');
+  document.getElementById('admin-portal-password').value = '';
+  document.getElementById('employee-portal-password').value = '';
+  window.scrollTo(0, 0);
+}
+
 function loadState() {
   const saved = localStorage.getItem('dayflow_app_state_v2');
   if (saved) {
