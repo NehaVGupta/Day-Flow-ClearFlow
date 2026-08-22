@@ -10,6 +10,25 @@
 *   **Data Analytics**: Real-time tracking and visual insights for your daily routines.
 *   **Clean UI**: Simple, single-page dashboard built for speed and ease of use.
 
+## 🔑 Login Credentials
+
+Access is role-based. Passwords are auto-generated from the registered email address using the pattern below (this is prototype logic for demo purposes only — not intended for production use).
+
+| Role | Username Rule | Password Rule | Example Email | Example Password |
+|---|---|---|---|---|
+| **HR / Admin** | Registered email | First **3** characters of email + `@123` | `nehavgupta25@gmail.com` | `neh@123` |
+| **Employee** | Registered email | First **4** characters of email + `@123` | `nehavgupta25@gmail.com` | `neha@123` |
+
+> ℹ️ Character count is taken from the part of the email before `@`, in lowercase.
+
+## 🔄 App Flow
+
+1.  **Landing / Login** — User opens `index.html` and lands on the login screen, choosing to sign in as **HR/Admin** or **Employee** using the credential pattern above.
+2.  **Role-Based Dashboard** — `app.js` routes the user to the relevant dashboard view based on role, rendering the layout defined in `index.html` and styled via `style.css`.
+3.  **Data Analytics** — `analytics.js` loads mock/sample data and generates real-time charts and productivity scores shown on the dashboard.
+4.  **AI Copilot Interaction** — `ai-copilot.js` handles user prompts entered in the assistant panel, simulating AI-guided suggestions for daily workflow planning.
+5.  **Live UI Updates** — Button clicks and state changes (e.g. marking tasks complete, adjusting schedule) are managed by `app.js`, updating the dashboard instantly without a page reload.
+
 ## 📂 Project Structure
 
 ```text
@@ -43,7 +62,7 @@ Follow these steps to run the project locally:
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com
+    git clone https://github.com/NehaVGupta/Day-Flow-ClearFlow.git
     ```
 
 2.  **Navigate into the directory**
@@ -60,3 +79,6 @@ Follow these steps to run the project locally:
     ```bash
     npm start
     ```
+
+5.  **Log in**
+    Use the [Login Credentials](#-login-credentials) pattern above to sign in as HR/Admin or Employee.
