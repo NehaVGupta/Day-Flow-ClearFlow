@@ -341,9 +341,11 @@ function loadState() {
   if (saved) {
     appState = JSON.parse(saved);
     syncSeedUsers();
+    syncEmployeeAttendanceData();
     saveState();
   } else {
     appState = SEED_DATA;
+    syncEmployeeAttendanceData();
     saveState();
   }
 }
@@ -352,6 +354,39 @@ function syncSeedUsers() {
   const existingIds = new Set(appState.users.map(user => user.id));
   const missingUsers = SEED_DATA.users.filter(user => !existingIds.has(user.id));
   appState.users.push(...missingUsers);
+}
+
+function syncEmployeeAttendanceData() {
+  const employees = appState.users.filter(user => user.role === 'employee');
+  const existingLogs = new Set(appState.attendanceLogs.map(log => `${log.empId}-${log.date}`));
+  const startDate = new Date(Date.UTC(2026, 7, 7));
+
+  employees.forEach((employee, employeeIndex) => {
+    for (let dayOffset = 0; dayOffset < 15; dayOffset += 1) {
+      const date = new Date(startDate);
+      date.setUTCDate(startDate.getUTCDate() + dayOffset);
+      if (date.getUTCDay() === 0 || date.getUTCDay() === 6) continue;
+
+      const dateString = date.toISOString().split('T')[0];
+      const logKey = `${employee.id}-${dateString}`;
+      if (existingLogs.has(logKey)) continue;
+
+      const checkInMinutes = 55 + ((dayOffset * 7 + employeeIndex * 3) % 20);
+      const checkOutMinutes = 10 + ((dayOffset * 5 + employeeIndex * 4) % 25);
+      appState.attendanceLogs.push({
+        date: dateString,
+        empName: employee.name,
+        empId: employee.id,
+        checkIn: `09:${String(checkInMinutes).padStart(2, '0')} AM`,
+        checkOut: `05:${String(checkOutMinutes).padStart(2, '0')} PM`,
+        hours: '8h 15m',
+        status: 'Present'
+      });
+      existingLogs.add(logKey);
+    }
+  });
+
+  appState.attendanceLogs.sort((first, second) => second.date.localeCompare(first.date));
 }
 
 function saveState() {
