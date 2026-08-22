@@ -185,6 +185,7 @@ let appState = {};
 let currentAuthUser = null; // Object of logged in user
 let isHrInspectingEmployee = false;
 let passwordChangeOtp = null;
+let portalHistory = [];
 
 // Shift Clock
 let checkInTimerInterval = null;
@@ -291,6 +292,7 @@ function selectEmployeeAccount(email, name, closeMenu = true) {
 
 function handlePortalLogin(e, role) {
   e.preventDefault();
+  portalHistory = [];
   const prefix = role === 'admin' ? 'admin' : 'employee';
   const email = document.getElementById(`${prefix}-portal-email`).value.trim();
   const password = document.getElementById(`${prefix}-portal-password`).value.trim();
@@ -337,6 +339,20 @@ function showWorkspaceAfterLogin() {
 }
 
 function returnToPortalEntry() {
+  const previousPortal = portalHistory.pop();
+  if (previousPortal) {
+    appState.activeRoleId = previousPortal.activeRoleId;
+    appState.viewAsEmpId = previousPortal.viewAsEmpId;
+    currentAuthUser = appState.users.find(user => user.id === previousPortal.userId);
+    isHrInspectingEmployee = previousPortal.isHrInspectingEmployee;
+    saveState();
+    updateRoleUI();
+    initUI();
+    showToast(`Returned to ${currentAuthUser.name}'s portal.`, 'info');
+    window.scrollTo(0, 0);
+    return;
+  }
+
   const portalEntryScreen = document.getElementById('portal-entry-screen');
   if (portalEntryScreen) {
     portalEntryScreen.removeAttribute('aria-hidden');
@@ -428,6 +444,12 @@ function adminSwitchViewToEmployee(empId) {
     openHRAuthPromptModal('Only Admin can switch employee views.');
     return;
   }
+  portalHistory.push({
+    activeRoleId: appState.activeRoleId,
+    viewAsEmpId: appState.viewAsEmpId,
+    userId: currentAuthUser.id,
+    isHrInspectingEmployee
+  });
   appState.activeRoleId = 'employee';
   appState.viewAsEmpId = empId;
   currentAuthUser = appState.users.find(u => u.id === empId);
