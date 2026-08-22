@@ -135,10 +135,19 @@ function handlePortalLogin(e, role) {
 
   saveState();
   document.body.classList.add('portal-session');
-  document.getElementById('portal-entry-screen').setAttribute('aria-hidden', 'true');
+  showWorkspaceAfterLogin();
   updateRoleUI();
   initUI();
   showToast(`Welcome back, ${currentAuthUser.name}!`, 'success');
+}
+
+function showWorkspaceAfterLogin() {
+  const portalEntryScreen = document.getElementById('portal-entry-screen');
+  if (portalEntryScreen) {
+    portalEntryScreen.setAttribute('aria-hidden', 'true');
+    portalEntryScreen.style.display = 'none';
+  }
+  window.scrollTo(0, 0);
 }
 
 function loadState() {
@@ -305,6 +314,7 @@ function handleSignInSubmit(e) {
 
   saveState();
   closeModal('modal-auth');
+  showWorkspaceAfterLogin();
   updateRoleUI();
   initUI();
   showToast(`Welcome back, ${currentAuthUser.name}!`, 'success');
