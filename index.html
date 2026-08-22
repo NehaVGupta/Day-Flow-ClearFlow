@@ -686,6 +686,13 @@
                 <div class="card-title"><i class="fa-solid fa-chart-column"></i> Weekly Attendance Trends (%)</div>
               </div>
               <canvas id="chart-attendance" height="220"></canvas>
+              <div class="analytics-detail-panel" id="attendance-analysis" hidden>
+                <div class="analytics-detail-header">
+                  <h4 id="attendance-analysis-title">Attendance Analysis</h4>
+                  <button class="analytics-detail-close" type="button" onclick="hideAttendanceAnalysis()" aria-label="Close attendance analysis">Close</button>
+                </div>
+                <div id="attendance-analysis-content"></div>
+              </div>
             </div>
 
             <!-- Department Salary Distribution -->
@@ -694,6 +701,13 @@
                 <div class="card-title"><i class="fa-solid fa-chart-pie"></i> Salary Expenditure by Department</div>
               </div>
               <canvas id="chart-salary" height="220"></canvas>
+              <div class="analytics-detail-panel" id="salary-analysis" hidden>
+                <div class="analytics-detail-header">
+                  <h4 id="salary-analysis-title">Salary Analysis</h4>
+                  <button class="analytics-detail-close" type="button" onclick="hideSalaryAnalysis()" aria-label="Close salary analysis">Close</button>
+                </div>
+                <div id="salary-analysis-content"></div>
+              </div>
             </div>
           </div>
         </section>

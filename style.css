@@ -1045,6 +1045,149 @@ button, input, select, textarea {
   color: #334155;
 }
 
+.analytics-detail-panel[hidden] {
+  display: none;
+}
+
+.analytics-detail-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #cbdcf0;
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-md);
+  background: #f7faff;
+  color: #172b4d;
+  animation: analytics-detail-reveal 0.25s ease both;
+}
+
+#chart-attendance,
+#chart-salary {
+  cursor: pointer;
+}
+
+@keyframes analytics-detail-reveal {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.analytics-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.analytics-detail-header h4 {
+  color: #172b4d;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.analytics-detail-close {
+  border: 1px solid #b9cde1;
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.65rem;
+  background: #ffffff;
+  color: #285a7d;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.analytics-detail-close:hover {
+  background: #eaf3ff;
+  border-color: #67b7e8;
+}
+
+.analytics-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.analytics-metric-grid > div {
+  padding: 0.55rem;
+  border: 1px solid #dbe5ef;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+}
+
+.analytics-metric-grid strong,
+.analytics-metric-grid span {
+  display: block;
+}
+
+.analytics-metric-grid strong {
+  color: #172b4d;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.analytics-metric-grid span {
+  color: #536176;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.analytics-summary {
+  margin-bottom: 0.75rem;
+  color: #334155;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.analytics-employee-group {
+  margin-top: 0.55rem;
+  border-top: 1px solid #dbe5ef;
+  padding-top: 0.55rem;
+}
+
+.analytics-employee-group summary {
+  color: #285a7d;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.analytics-employee-list {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.analytics-employee-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.65rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  font-size: 0.72rem;
+}
+
+.analytics-employee-row strong {
+  color: #172b4d;
+}
+
+.analytics-employee-row span {
+  color: #536176;
+}
+
+.analytics-empty-state {
+  margin-top: 0.55rem;
+  color: #536176;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .analytics-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;
