@@ -81,10 +81,6 @@ function generateAIResponse(query) {
     Logged in as <strong>${user.name}</strong>. Your shift timer is active in the top bar!`;
   }
 
-  // 4. Default General Response
-  return `🤖 I'm <strong>FlowAI HR Assistant</strong>! I can help you with:<br>
-  1. Checking leave balances & applying for time-off<br>
-  2. Generating official salary pay slips<br>
-  3. Shift & attendance log tracking<br>
-  4. Answering HR policy questions`;
+  // 4. Queries outside the available database
+  return `i cant answer this question`;
 }
