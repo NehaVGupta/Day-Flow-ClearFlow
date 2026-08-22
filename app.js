@@ -1219,7 +1219,7 @@ function renderPayrollView() {
         <td>$${u.salary.base.toLocaleString()}.00</td>
         <td>$${(u.salary.hra + u.salary.allowance).toLocaleString()}.00</td>
         <td>-$${u.salary.deductions.toLocaleString()}.00</td>
-        <td style="font-weight: 700; color: #34d399;">$${(u.salary.base + u.salary.hra + u.salary.allowance - u.salary.deductions).toLocaleString()}.00</td>
+        <td style="font-weight: 700; color: #15803d;">$${(u.salary.base + u.salary.hra + u.salary.allowance - u.salary.deductions).toLocaleString()}.00</td>
         <td>
           <button class="btn btn-secondary btn-sm" onclick="showToast('Salary structure updated for ${u.name}', 'success')">
             <i class="fa-solid fa-pen-to-square"></i> Edit Pay
