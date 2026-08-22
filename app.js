@@ -105,6 +105,42 @@ document.addEventListener('DOMContentLoaded', () => {
   startShiftTimer();
 });
 
+function handlePortalLogin(e, role) {
+  e.preventDefault();
+  const prefix = role === 'admin' ? 'admin' : 'employee';
+  const email = document.getElementById(`${prefix}-portal-email`).value.trim();
+  const password = document.getElementById(`${prefix}-portal-password`).value.trim();
+  const error = document.getElementById(`${prefix}-portal-error`);
+  error.innerText = '';
+
+  if (role === 'admin') {
+    const hrUser = appState.users.find(u => u.role === 'admin');
+    if (email.toLowerCase() !== hrUser.email.toLowerCase() || password !== HR_DEFAULT_PASSWORD) {
+      error.innerText = 'Invalid HR email or password. Please check your credentials.';
+      return;
+    }
+    currentAuthUser = hrUser;
+    appState.activeRoleId = 'admin';
+  } else {
+    const employee = appState.users.find(u => u.role === 'employee' && u.email.toLowerCase() === email.toLowerCase());
+    const securityError = validatePasswordSecurity(password);
+    if (!employee || (securityError && password !== 'password123' && password !== 'Employee@123')) {
+      error.innerText = 'Invalid employee email or password. Please check your credentials.';
+      return;
+    }
+    currentAuthUser = employee;
+    appState.activeRoleId = 'employee';
+    appState.viewAsEmpId = employee.id;
+  }
+
+  saveState();
+  document.body.classList.add('portal-session');
+  document.getElementById('portal-entry-screen').setAttribute('aria-hidden', 'true');
+  updateRoleUI();
+  initUI();
+  showToast(`Welcome back, ${currentAuthUser.name}!`, 'success');
+}
+
 function loadState() {
   const saved = localStorage.getItem('dayflow_app_state_v2');
   if (saved) {

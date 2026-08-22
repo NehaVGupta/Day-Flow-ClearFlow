@@ -14,6 +14,55 @@
 </head>
 <body>
 
+  <section class="portal-entry-screen" id="portal-entry-screen">
+    <div class="portal-entry-brand">
+      <div class="brand-icon"><i class="fa-solid fa-layer-group"></i></div>
+      <div>
+        <div class="brand-title">Dayflow</div>
+        <p>Every workday aligned</p>
+      </div>
+    </div>
+    <div class="portal-entry-heading">
+      <span class="portal-kicker">Secure workspace access</span>
+      <h1>Choose your portal</h1>
+      <p>Sign in to continue to the workspace built for your role.</p>
+    </div>
+    <div class="portal-login-grid">
+      <form class="portal-login-card hr-login-card" onsubmit="handlePortalLogin(event, 'admin')">
+        <div class="portal-card-icon"><i class="fa-solid fa-user-shield"></i></div>
+        <div class="portal-card-heading">
+          <span class="portal-kicker">For people teams</span>
+          <h2>Admin / HR Portal</h2>
+          <p>Manage people, attendance, payroll, approvals, and reports.</p>
+        </div>
+        <div class="portal-form-error" id="admin-portal-error"></div>
+        <label class="form-label" for="admin-portal-email">Work email</label>
+        <input class="form-control" id="admin-portal-email" type="email" value="sarah.connor@dayflow.io" placeholder="hr@dayflow.io" required>
+        <label class="form-label" for="admin-portal-password">Password</label>
+        <input class="form-control" id="admin-portal-password" type="password" placeholder="Enter HR password" required>
+        <button class="btn btn-primary portal-login-button" type="submit"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign in to Admin / HR</button>
+        <small>Authorized HR access only</small>
+      </form>
+
+      <form class="portal-login-card employee-login-card" onsubmit="handlePortalLogin(event, 'employee')">
+        <div class="portal-card-icon"><i class="fa-solid fa-user-tie"></i></div>
+        <div class="portal-card-heading">
+          <span class="portal-kicker">For every employee</span>
+          <h2>Employee Portal</h2>
+          <p>Track your workday, leave, attendance, profile, and salary.</p>
+        </div>
+        <div class="portal-form-error" id="employee-portal-error"></div>
+        <label class="form-label" for="employee-portal-email">Work email</label>
+        <input class="form-control" id="employee-portal-email" type="email" value="alex.morgan@dayflow.io" placeholder="you@dayflow.io" required>
+        <label class="form-label" for="employee-portal-password">Password</label>
+        <input class="form-control" id="employee-portal-password" type="password" placeholder="Enter your password" required>
+        <button class="btn btn-employee portal-login-button" type="submit"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign in to Employee Portal</button>
+        <small>Use your company credentials</small>
+      </form>
+    </div>
+    <p class="portal-entry-footer">Dayflow HRMS <span>•</span> Secure role-based access</p>
+  </section>
+
   <!-- ==========================================================================
        HACKATHON CONTROL TOP BAR (Role Authentication & HR Controls)
        ========================================================================== -->
