@@ -1222,6 +1222,9 @@ function closeModal(id) {
 }
 
 function openAuthModal() {
+  document.querySelector('.auth-modal-tabs').style.display = 'flex';
+  document.querySelector('#modal-auth .card-title').innerHTML = '<i class="fa-solid fa-lock"></i> Dayflow System Portal Sign In';
+  switchAuthTab('signin');
   openModal('modal-auth');
 }
 
@@ -1231,6 +1234,8 @@ function openAddEmployeeModal() {
     return;
   }
 
+  document.querySelector('.auth-modal-tabs').style.display = 'none';
+  document.querySelector('#modal-auth .card-title').innerHTML = '<i class="fa-solid fa-user-plus"></i> Add New Employee';
   switchAuthTab('signup');
   document.getElementById('signup-role').value = 'employee';
   updateSignupPassword();
