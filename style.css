@@ -579,6 +579,17 @@ button, input, select, textarea {
   display: none;
 }
 
+.hr-inspecting-employee .employee-self-action,
+.hr-portal .employee-self-action {
+  display: none;
+}
+
+.password-modal-copy {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
 .nav-menu {
   padding: 1.25rem 0.85rem;
   flex: 1;

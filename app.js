@@ -1,19 +1,27 @@
 /* ==========================================================================
    DAYFLOW HRMS - MAIN APPLICATION LOGIC & STATE ENGINE
    Refactored according to strict HRMS requirements:
-   1. Role authentication: HR password 'admin@123' required for Admin access.
+  1. Role authentication uses an email-derived password for every account.
       Admin can view employee dashboards; employees cannot access HR without auth.
    2. Strict Employee Dashboard isolation: shows ONLY logged-in employee details.
    3. HR portal: Remove "Apply for Time Off" (HR portal is for leave approvals only).
    4. Employee dashboard tracks Attendance, Salary, and Leave balances.
-   5. Security rules: Passwords require 8+ chars, uppercase, number, special char.
+  5. Account password format: first four email characters plus '@123'.
    ========================================================================== */
 
-const HR_DEFAULT_PASSWORD = 'admin@123';
+function getDefaultPassword(email) {
+  const emailName = email.toLowerCase().split('@')[0];
+  return `${emailName.slice(0, 4)}@123`;
+}
+
+function getUserPassword(user) {
+  return user.password || getDefaultPassword(user.email);
+}
 
 // Seed Database
 const SEED_DATA = {
   activeRoleId: 'admin', // 'admin' or 'employee'
+  activeAdminId: 'HR-8842',
   viewAsEmpId: 'EMP-4019', // Default employee ID to view if admin switches to employee view
   users: [
     {
@@ -176,6 +184,7 @@ const SEED_DATA = {
 let appState = {};
 let currentAuthUser = null; // Object of logged in user
 let isHrInspectingEmployee = false;
+let passwordChangeOtp = null;
 
 // Shift Clock
 let checkInTimerInterval = null;
@@ -290,17 +299,17 @@ function handlePortalLogin(e, role) {
 
   if (role === 'admin') {
     const hrUser = appState.users.find(u => u.role === 'admin' && u.email.toLowerCase() === email.toLowerCase());
-    if (!hrUser || password !== HR_DEFAULT_PASSWORD) {
+    if (!hrUser || password !== getUserPassword(hrUser)) {
       error.innerText = 'Invalid HR email or password. Please check your credentials.';
       return;
     }
     currentAuthUser = hrUser;
     appState.activeRoleId = 'admin';
+    appState.activeAdminId = hrUser.id;
     isHrInspectingEmployee = false;
   } else {
     const employee = appState.users.find(u => u.role === 'employee' && u.email.toLowerCase() === email.toLowerCase());
-    const securityError = validatePasswordSecurity(password);
-    if (!employee || (securityError && password !== 'password123' && password !== 'Employee@123')) {
+    if (!employee || password !== getUserPassword(employee)) {
       error.innerText = 'Invalid employee email or password. Please check your credentials.';
       return;
     }
@@ -378,7 +387,7 @@ function adminSwitchViewToEmployee(empId) {
   showToast(`Admin inspecting view as Employee: ${currentAuthUser.name}`, 'info');
 }
 
-// Switching back to HR Admin from Employee view REQUIRES HR Password 'admin@123'
+// Switching back to HR Admin from Employee view requires the selected HR password.
 function requestSwitchToHR() {
   if (appState.activeRoleId === 'admin') {
     showToast('You are already logged in as HR Admin.', 'info');
@@ -394,7 +403,7 @@ function openHRAuthPromptModal(customMsg = '') {
   if (customMsg) {
     document.getElementById('hr-auth-msg').innerText = customMsg;
   } else {
-    document.getElementById('hr-auth-msg').innerText = 'Enter HR Admin password (admin@123) to access Admin Portal.';
+    document.getElementById('hr-auth-msg').innerText = 'Enter the password for the selected HR account to access Admin Portal.';
   }
   openModal('modal-hr-auth-prompt');
 }
@@ -404,12 +413,14 @@ function submitHRAuthPrompt(e) {
   const inputPwd = document.getElementById('hr-auth-password-input').value.trim();
   const errBox = document.getElementById('hr-auth-error');
 
-  if (inputPwd === HR_DEFAULT_PASSWORD) {
+  const hrUser = appState.users.find(u => u.id === appState.activeAdminId && u.role === 'admin') || appState.users.find(u => u.role === 'admin');
+  if (hrUser && inputPwd === getUserPassword(hrUser)) {
     errBox.style.display = 'none';
     closeModal('modal-hr-auth-prompt');
 
     appState.activeRoleId = 'admin';
     currentAuthUser = appState.users.find(u => u.role === 'admin');
+    appState.activeAdminId = currentAuthUser.id;
     isHrInspectingEmployee = false;
     saveState();
 
@@ -417,7 +428,7 @@ function submitHRAuthPrompt(e) {
     initUI();
     showToast('Authenticated successfully as HR Admin (Sarah Connor)!', 'success');
   } else {
-    errBox.innerText = '❌ Incorrect HR Password! Access Denied. (Hint: admin@123)';
+    errBox.innerText = 'Incorrect HR email password. Access denied.';
     errBox.style.display = 'block';
   }
 }
@@ -474,24 +485,19 @@ function handleSignInSubmit(e) {
   errBox.style.display = 'none';
 
   if (roleType === 'admin') {
-    if (password !== HR_DEFAULT_PASSWORD) {
-      errBox.innerText = '❌ Invalid HR Credentials! Password for HR must be admin@123';
+    const hrUser = appState.users.find(u => u.role === 'admin' && u.email.toLowerCase() === email.toLowerCase());
+    if (!hrUser || password !== getUserPassword(hrUser)) {
+      errBox.innerText = '❌ Invalid HR credentials.';
       errBox.style.display = 'block';
       return;
     }
     appState.activeRoleId = 'admin';
     currentAuthUser = appState.users.find(u => u.role === 'admin');
+    appState.activeAdminId = currentAuthUser.id;
     isHrInspectingEmployee = false;
   } else {
-    // Validate password security rules
-    const securityErr = validatePasswordSecurity(password);
-    if (securityErr && password !== 'password123' && password !== 'Employee@123') {
-      errBox.innerText = `❌ Security Rule Failed: ${securityErr}`;
-      errBox.style.display = 'block';
-      return;
-    }
-    const foundUser = appState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (!foundUser) {
+    const foundUser = appState.users.find(u => u.role === 'employee' && u.email.toLowerCase() === email.toLowerCase());
+    if (roleType !== 'employee' || !foundUser || password !== getUserPassword(foundUser)) {
       errBox.innerText = '❌ Employee account not found. Please register or check your email.';
       errBox.style.display = 'block';
       return;
@@ -517,17 +523,10 @@ function handleSignUpSubmit(e) {
   const name = document.getElementById('signup-name').value.trim();
   const email = document.getElementById('signup-email').value.trim();
   const role = document.getElementById('signup-role').value;
-  const password = document.getElementById('signup-password').value.trim();
+  const password = getDefaultPassword(email);
   const errBox = document.getElementById('signup-error-box');
 
   errBox.style.display = 'none';
-
-  const securityErr = validatePasswordSecurity(password);
-  if (securityErr) {
-    errBox.innerText = `❌ Password Security Requirement: ${securityErr}`;
-    errBox.style.display = 'block';
-    return;
-  }
 
   // Create user
   const newUser = {
@@ -537,6 +536,7 @@ function handleSignUpSubmit(e) {
     title: role === 'admin' ? 'HR Specialist' : 'Software Associate',
     dept: role === 'admin' ? 'Human Resources' : 'Engineering',
     email: email,
+    password: password,
     phone: '+1 (555) 000-1122',
     address: 'City Center',
     doj: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
@@ -904,6 +904,48 @@ function openEditProfileModal() {
   openModal('modal-edit-profile');
 }
 
+function openChangePasswordModal() {
+  if (!currentAuthUser || currentAuthUser.role !== 'employee' || isHrInspectingEmployee) {
+    showToast('Only the directly signed-in employee can change this password.', 'info');
+    return;
+  }
+
+  passwordChangeOtp = String(Math.floor(100000 + Math.random() * 900000));
+  document.getElementById('password-otp').value = '';
+  document.getElementById('new-password').value = '';
+  document.getElementById('confirm-new-password').value = '';
+  document.getElementById('password-change-error').innerText = '';
+  document.getElementById('password-otp-message').innerText = `A one-time code was sent to ${currentAuthUser.email}. Demo email code: ${passwordChangeOtp}`;
+  openModal('modal-change-password');
+}
+
+function handlePasswordChange(e) {
+  e.preventDefault();
+  const error = document.getElementById('password-change-error');
+  const otp = document.getElementById('password-otp').value.trim();
+  const newPassword = document.getElementById('new-password').value;
+  const confirmation = document.getElementById('confirm-new-password').value;
+
+  if (!currentAuthUser || currentAuthUser.role !== 'employee' || isHrInspectingEmployee) {
+    error.innerText = 'Only the directly signed-in employee can change this password.';
+    return;
+  }
+  if (otp !== passwordChangeOtp) {
+    error.innerText = 'Incorrect or expired verification code.';
+    return;
+  }
+  if (newPassword.length < 6 || newPassword !== confirmation) {
+    error.innerText = 'Passwords must match and contain at least 6 characters.';
+    return;
+  }
+
+  currentAuthUser.password = newPassword;
+  passwordChangeOtp = null;
+  saveState();
+  closeModal('modal-change-password');
+  showToast('Your password was updated successfully.', 'success');
+}
+
 function handleProfileSave(e) {
   e.preventDefault();
   const user = currentAuthUser;
@@ -1117,9 +1159,15 @@ function openAddEmployeeModal() {
 
   switchAuthTab('signup');
   document.getElementById('signup-role').value = 'employee';
-  document.getElementById('signup-password').value = 'Employee@123';
+  updateSignupPassword();
   document.getElementById('signup-error-box').style.display = 'none';
   openModal('modal-auth');
+}
+
+function updateSignupPassword() {
+  const email = document.getElementById('signup-email');
+  const password = document.getElementById('signup-password');
+  if (email && password) password.value = getDefaultPassword(email.value.trim());
 }
 
 function switchAuthTab(type) {

@@ -48,7 +48,7 @@
         <label class="form-label" for="admin-portal-password">Password</label>
         <input class="form-control" id="admin-portal-password" type="password" placeholder="Enter HR password" required>
         <button class="btn btn-primary portal-login-button" type="submit"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign in to Admin / HR</button>
-        <small>Demo password for all HR profiles: <strong>admin@123</strong></small>
+        <small>Use the password generated from this account email.</small>
       </form>
 
       <form class="portal-login-card employee-login-card" onsubmit="handlePortalLogin(event, 'employee')">
@@ -71,7 +71,7 @@
         <label class="form-label" for="employee-portal-password">Password</label>
         <input class="form-control" id="employee-portal-password" type="password" placeholder="Enter your password" required>
         <button class="btn btn-employee portal-login-button" type="submit"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign in to Employee Portal</button>
-        <small>Demo password for all employee profiles: <strong>Employee@123</strong></small>
+        <small>Use the password generated from this account email.</small>
       </form>
     </div>
     <p class="portal-entry-footer">Dayflow HRMS <span>•</span> Secure role-based access</p>
@@ -420,6 +420,9 @@
               <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="openEditProfileModal()">
                 <i class="fa-solid fa-user-pen"></i> Edit Profile Details
               </button>
+              <button class="btn btn-secondary btn-sm employee-self-action" style="width: 100%; margin-top: 0.65rem;" onclick="openChangePasswordModal()">
+                <i class="fa-solid fa-key"></i> Change Password
+              </button>
             </div>
 
             <!-- Profile Details Tabs Container -->
@@ -737,7 +740,7 @@
        MODALS
        ========================================================================== -->
 
-  <!-- 1. HR AUTH PASSWORD PROMPT MODAL (Password admin@123 required) -->
+  <!-- 1. HR AUTH PASSWORD PROMPT MODAL -->
   <div class="modal-overlay" id="modal-hr-auth-prompt">
     <div class="modal-box" style="max-width: 440px;">
       <div class="modal-header">
@@ -755,7 +758,6 @@
         <div class="form-group">
           <label class="form-label">HR Admin Password</label>
           <input type="password" class="form-control" id="hr-auth-password-input" placeholder="Enter HR password..." required autofocus>
-          <span style="font-size: 0.75rem; color: #a5b4fc; display: block; margin-top: 0.35rem;">* Hint: HR Password is <strong>admin@123</strong></span>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fa-solid fa-key"></i> Authenticate HR Admin</button>
       </form>
@@ -893,6 +895,36 @@
     </div>
   </div>
 
+  <!-- 5. EMPLOYEE PASSWORD CHANGE MODAL -->
+  <div class="modal-overlay" id="modal-change-password">
+    <div class="modal-box" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3 class="card-title"><i class="fa-solid fa-key"></i> Change Your Password</h3>
+        <button class="modal-close" onclick="closeModal('modal-change-password')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p class="password-modal-copy" id="password-otp-message">We will send a one-time verification code to your registered email.</p>
+      <div class="portal-form-error" id="password-change-error"></div>
+      <form id="form-change-password" onsubmit="handlePasswordChange(event)">
+        <div class="form-group">
+          <label class="form-label" for="password-otp">Email verification code</label>
+          <input class="form-control" id="password-otp" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="Enter 6-digit OTP" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-password">New password</label>
+          <input class="form-control" id="new-password" type="password" minlength="6" placeholder="Enter a new password" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="confirm-new-password">Confirm new password</label>
+          <input class="form-control" id="confirm-new-password" type="password" minlength="6" placeholder="Repeat the new password" required>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-change-password')">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-shield-check"></i> Save Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- 5. AUTHENTICATION SIGN IN / SIGN UP MODAL -->
   <div class="modal-overlay" id="modal-auth">
     <div class="modal-box">
@@ -925,8 +957,7 @@
 
         <div class="form-group">
           <label class="form-label">Password</label>
-          <input type="password" class="form-control" id="signin-password" placeholder="••••••••" required value="Employee@123">
-          <span style="font-size: 0.75rem; color: #a5b4fc; margin-top: 0.25rem; display: block;">* Note: HR Password is <strong>admin@123</strong></span>
+          <input type="password" class="form-control" id="signin-password" placeholder="Enter account password" required>
         </div>
 
         <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In to Portal</button>
@@ -948,7 +979,7 @@
 
         <div class="form-group">
           <label class="form-label">Work Email</label>
-          <input type="email" class="form-control" id="signup-email" placeholder="john.doe@dayflow.io" required>
+          <input type="email" class="form-control" id="signup-email" placeholder="john.doe@dayflow.io" oninput="updateSignupPassword()" required>
         </div>
 
         <div class="form-group">
@@ -960,10 +991,10 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Password</label>
-          <input type="password" class="form-control" id="signup-password" placeholder="e.g. Password@123" required>
+          <label class="form-label">Generated password</label>
+          <input type="text" class="form-control" id="signup-password" placeholder="Enter work email first" readonly required>
           <span style="font-size: 0.725rem; color: #a5b4fc; margin-top: 0.35rem; display: block;">
-            New employees can sign in with the shared demo password <strong>Employee@123</strong>.
+            Password is generated from the first four characters of the work email plus <strong>@123</strong>.
           </span>
         </div>
 
