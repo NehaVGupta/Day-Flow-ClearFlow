@@ -175,6 +175,7 @@ const SEED_DATA = {
 // Global App State
 let appState = {};
 let currentAuthUser = null; // Object of logged in user
+let isHrInspectingEmployee = false;
 
 // Shift Clock
 let checkInTimerInterval = null;
@@ -295,6 +296,7 @@ function handlePortalLogin(e, role) {
     }
     currentAuthUser = hrUser;
     appState.activeRoleId = 'admin';
+    isHrInspectingEmployee = false;
   } else {
     const employee = appState.users.find(u => u.role === 'employee' && u.email.toLowerCase() === email.toLowerCase());
     const securityError = validatePasswordSecurity(password);
@@ -305,6 +307,7 @@ function handlePortalLogin(e, role) {
     currentAuthUser = employee;
     appState.activeRoleId = 'employee';
     appState.viewAsEmpId = employee.id;
+    isHrInspectingEmployee = false;
   }
 
   saveState();
@@ -367,6 +370,7 @@ function adminSwitchViewToEmployee(empId) {
   appState.activeRoleId = 'employee';
   appState.viewAsEmpId = empId;
   currentAuthUser = appState.users.find(u => u.id === empId);
+  isHrInspectingEmployee = true;
   saveState();
 
   updateRoleUI();
@@ -406,6 +410,7 @@ function submitHRAuthPrompt(e) {
 
     appState.activeRoleId = 'admin';
     currentAuthUser = appState.users.find(u => u.role === 'admin');
+    isHrInspectingEmployee = false;
     saveState();
 
     updateRoleUI();
@@ -423,6 +428,7 @@ function updateRoleUI() {
 
   document.body.classList.toggle('employee-portal', !isHr);
   document.body.classList.toggle('hr-portal', isHr);
+  document.body.classList.toggle('hr-inspecting-employee', isHrInspectingEmployee);
 
   document.getElementById('role-btn-admin').classList.toggle('active', isHr);
   document.getElementById('role-btn-employee').classList.toggle('active', !isHr);
@@ -475,6 +481,7 @@ function handleSignInSubmit(e) {
     }
     appState.activeRoleId = 'admin';
     currentAuthUser = appState.users.find(u => u.role === 'admin');
+    isHrInspectingEmployee = false;
   } else {
     // Validate password security rules
     const securityErr = validatePasswordSecurity(password);
@@ -492,6 +499,7 @@ function handleSignInSubmit(e) {
     appState.activeRoleId = 'employee';
     appState.viewAsEmpId = foundUser.id;
     currentAuthUser = foundUser;
+    isHrInspectingEmployee = false;
   }
 
   saveState();
@@ -543,6 +551,7 @@ function handleSignUpSubmit(e) {
   appState.activeRoleId = role;
   if (role === 'employee') appState.viewAsEmpId = empId;
   currentAuthUser = newUser;
+  isHrInspectingEmployee = false;
 
   saveState();
   closeModal('modal-auth');
@@ -717,6 +726,8 @@ function renderEmployeeDashboard() {
   // Set User Profile Card on Dashboard Header
   document.getElementById('emp-dash-welcome-name').innerText = user.name;
   document.getElementById('emp-dash-emp-id').innerText = `ID: ${user.id} | ${user.title}`;
+  const readonlyNotice = document.getElementById('employee-readonly-notice');
+  if (readonlyNotice) readonlyNotice.style.display = isHrInspectingEmployee ? 'block' : 'none';
 
   // Track 1: Leave Balances for THIS Employee
   document.getElementById('emp-paid-leave-bal').innerText = `${user.leaves.paid} Days`;
@@ -786,6 +797,10 @@ function startShiftTimer() {
 }
 
 function toggleCheckIn() {
+  if (isHrInspectingEmployee) {
+    showToast('HR inspection mode is read-only. Sign in through the Employee Portal to check in.', 'info');
+    return;
+  }
   const btn = document.getElementById('checkin-toggle-btn');
   const user = currentAuthUser;
 
@@ -911,11 +926,12 @@ function renderLeaveTable() {
   if (!tbody) return;
 
   const isHr = appState.activeRoleId === 'admin';
+  const canApply = !isHr && !isHrInspectingEmployee;
   
   // Show/Hide "Apply for Time Off" buttons based on role
   const applyBtns = document.querySelectorAll('.apply-leave-btn-trigger');
   applyBtns.forEach(btn => {
-    btn.style.display = isHr ? 'none' : 'inline-flex'; // HR portal is for approvals, not applying
+    btn.style.display = canApply ? 'inline-flex' : 'none';
   });
 
   const requests = isHr
@@ -943,6 +959,10 @@ function renderLeaveTable() {
 }
 
 function openApplyLeaveModal() {
+  if (isHrInspectingEmployee) {
+    showToast('HR inspection mode is read-only. Sign in through the Employee Portal to apply for leave.', 'info');
+    return;
+  }
   if (appState.activeRoleId === 'admin') {
     showToast('HR Portal is for approving employee leaves.', 'info');
     return;
@@ -952,6 +972,10 @@ function openApplyLeaveModal() {
 
 function handleLeaveSubmit(e) {
   e.preventDefault();
+  if (isHrInspectingEmployee) {
+    showToast('HR inspection mode is read-only. Leave was not submitted.', 'info');
+    return;
+  }
   const user = currentAuthUser;
   const type = document.getElementById('leave-type-select').value;
   const start = document.getElementById('leave-start-date').value;

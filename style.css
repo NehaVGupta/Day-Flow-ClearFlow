@@ -499,6 +499,17 @@ button, input, select, textarea {
   color: #22d3ee;
 }
 
+.employee-readonly-notice {
+  display: none;
+  color: #fbbf24;
+  font-size: 0.75rem;
+  margin-top: 0.35rem;
+}
+
+.hr-inspecting-employee .btn-checkin {
+  display: none;
+}
+
 .hr-only-action {
   display: inline-flex;
 }
