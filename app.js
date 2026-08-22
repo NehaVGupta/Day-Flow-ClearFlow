@@ -190,7 +190,6 @@ const SEED_DATA = {
 let appState = {};
 let currentAuthUser = null; // Object of logged in user
 let isHrInspectingEmployee = false;
-let passwordChangeOtp = null;
 let portalHistory = [];
 
 // Shift Clock
@@ -367,7 +366,6 @@ function returnToPortalEntry() {
 
   document.body.classList.remove('portal-session', 'hr-inspecting-employee', 'employee-portal', 'hr-portal');
   isHrInspectingEmployee = false;
-  passwordChangeOtp = null;
   closeModal('modal-change-password');
   closeModal('modal-auth');
   document.getElementById('admin-portal-password').value = '';
@@ -990,16 +988,31 @@ function openChangePasswordModal() {
     return;
   }
 
-  passwordChangeOtp = String(Math.floor(100000 + Math.random() * 900000));
   document.getElementById('password-otp').value = '';
   document.getElementById('new-password').value = '';
   document.getElementById('confirm-new-password').value = '';
   document.getElementById('password-change-error').innerText = '';
-  document.getElementById('password-otp-message').innerText = `A one-time code was sent to ${currentAuthUser.email}. Demo email code: ${passwordChangeOtp}`;
+  document.getElementById('password-otp-message').innerText = `A one-time verification code will be sent to ${currentAuthUser.email}.`;
   openModal('modal-change-password');
+  sendPasswordOtp();
 }
 
-function handlePasswordChange(e) {
+async function sendPasswordOtp() {
+  const error = document.getElementById('password-change-error');
+  try {
+    const response = await fetch('http://localhost:3001/api/password/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: currentAuthUser.email })
+    });
+    if (!response.ok) throw new Error('OTP service unavailable');
+    document.getElementById('password-otp-message').innerText = `A one-time verification code was sent to ${currentAuthUser.email}.`;
+  } catch (requestError) {
+    error.innerText = 'We could not send the verification email. Please start the API service and try again.';
+  }
+}
+
+async function handlePasswordChange(e) {
   e.preventDefault();
   const error = document.getElementById('password-change-error');
   const otp = document.getElementById('password-otp').value.trim();
@@ -1010,17 +1023,24 @@ function handlePasswordChange(e) {
     error.innerText = 'Only the directly signed-in employee can change this password.';
     return;
   }
-  if (otp !== passwordChangeOtp) {
-    error.innerText = 'Incorrect or expired verification code.';
-    return;
-  }
   if (newPassword.length < 6 || newPassword !== confirmation) {
     error.innerText = 'Passwords must match and contain at least 6 characters.';
     return;
   }
 
+  try {
+    const response = await fetch('http://localhost:3001/api/password/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: currentAuthUser.email, otp })
+    });
+    if (!response.ok) throw new Error('Invalid OTP');
+  } catch (requestError) {
+    error.innerText = 'Incorrect or expired verification code.';
+    return;
+  }
+
   currentAuthUser.password = newPassword;
-  passwordChangeOtp = null;
   saveState();
   closeModal('modal-change-password');
   showToast('Your password was updated successfully.', 'success');
