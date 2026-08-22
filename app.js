@@ -31,6 +31,48 @@ const SEED_DATA = {
       leaves: { paid: 12, sick: 7, unpaid: 0 }
     },
     {
+      id: 'HR-7731',
+      name: 'Daniel Brooks',
+      role: 'admin',
+      title: 'HR Business Partner',
+      dept: 'Human Resources',
+      email: 'daniel.brooks@dayflow.io',
+      phone: '+1 (555) 307-4412',
+      address: '12 Union Square, Metro City',
+      doj: 'Apr 05, 2023',
+      avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80',
+      salary: { base: 5900, hra: 2100, allowance: 1000, deductions: 800 },
+      leaves: { paid: 15, sick: 8, unpaid: 0 }
+    },
+    {
+      id: 'HR-6650',
+      name: 'Nora Patel',
+      role: 'admin',
+      title: 'People Operations Manager',
+      dept: 'Human Resources',
+      email: 'nora.patel@dayflow.io',
+      phone: '+1 (555) 926-5104',
+      address: '84 Garden Avenue, Northside',
+      doj: 'Sep 18, 2021',
+      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+      salary: { base: 6200, hra: 2200, allowance: 1150, deductions: 900 },
+      leaves: { paid: 13, sick: 7, unpaid: 0 }
+    },
+    {
+      id: 'HR-5589',
+      name: 'Owen Carter',
+      role: 'admin',
+      title: 'Payroll & Benefits Lead',
+      dept: 'People Operations',
+      email: 'owen.carter@dayflow.io',
+      phone: '+1 (555) 745-2386',
+      address: '5 Harbor Road, West District',
+      doj: 'Jan 22, 2024',
+      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
+      salary: { base: 5600, hra: 1800, allowance: 950, deductions: 680 },
+      leaves: { paid: 16, sick: 6, unpaid: 0 }
+    },
+    {
       id: 'EMP-4019',
       name: 'Alex Morgan',
       role: 'employee',
@@ -143,19 +185,98 @@ let isCheckedIn = false;
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   renderEmployeeAccountOptions();
+  renderAdminAccountOptions();
   initAuthSession();
   initUI();
   startShiftTimer();
 });
 
 function renderEmployeeAccountOptions() {
-  const accountSelect = document.getElementById('employee-portal-email');
-  if (!accountSelect || !appState.users) return;
+  const accountMenu = document.getElementById('employee-account-menu');
+  const accountLabel = document.getElementById('employee-account-label');
+  const accountInput = document.getElementById('employee-portal-email');
+  if (!accountMenu || !accountInput || !appState.users) return;
 
   const employees = appState.users.filter(user => user.role === 'employee');
-  accountSelect.innerHTML = employees.map(employee => `
-    <option value="${employee.email}">${employee.name} - ${employee.email}</option>
+  accountMenu.innerHTML = employees.map(employee => `
+    <button class="employee-account-option" type="button" role="option" data-email="${employee.email}" onclick="selectEmployeeAccount('${employee.email}', '${employee.name}')">
+      <strong>${employee.name}</strong>
+      <span>${employee.email}</span>
+    </button>
   `).join('');
+
+  const selectedEmployee = employees.find(employee => employee.email === accountInput.value) || employees[0];
+  if (selectedEmployee) selectEmployeeAccount(selectedEmployee.email, selectedEmployee.name, false);
+}
+
+function renderAdminAccountOptions() {
+  const accountMenu = document.getElementById('admin-account-menu');
+  const accountLabel = document.getElementById('admin-account-label');
+  const accountInput = document.getElementById('admin-portal-email');
+  if (!accountMenu || !accountInput || !appState.users) return;
+
+  const admins = appState.users.filter(user => user.role === 'admin');
+  accountMenu.innerHTML = admins.map(admin => `
+    <button class="employee-account-option" type="button" role="option" data-email="${admin.email}" onclick="selectAdminAccount('${admin.email}', '${admin.name}')">
+      <strong>${admin.name}</strong>
+      <span>${admin.email}</span>
+    </button>
+  `).join('');
+
+  const selectedAdmin = admins.find(admin => admin.email === accountInput.value) || admins[0];
+  if (selectedAdmin) selectAdminAccount(selectedAdmin.email, selectedAdmin.name, false);
+}
+
+function toggleAdminAccountPicker() {
+  const menu = document.getElementById('admin-account-menu');
+  const trigger = document.getElementById('admin-account-trigger');
+  if (!menu || !trigger) return;
+  const isOpen = menu.classList.toggle('open');
+  trigger.setAttribute('aria-expanded', String(isOpen));
+}
+
+function selectAdminAccount(email, name, closeMenu = true) {
+  const accountInput = document.getElementById('admin-portal-email');
+  const accountLabel = document.getElementById('admin-account-label');
+  const menu = document.getElementById('admin-account-menu');
+  const trigger = document.getElementById('admin-account-trigger');
+  if (!accountInput || !accountLabel) return;
+
+  accountInput.value = email;
+  accountLabel.innerHTML = `<strong>${name}</strong><span>${email}</span>`;
+  document.querySelectorAll('.admin-account-picker .employee-account-option').forEach(option => {
+    option.classList.toggle('selected', option.dataset.email === email);
+  });
+  if (closeMenu && menu && trigger) {
+    menu.classList.remove('open');
+    trigger.setAttribute('aria-expanded', 'false');
+  }
+}
+
+function toggleEmployeeAccountPicker() {
+  const menu = document.getElementById('employee-account-menu');
+  const trigger = document.getElementById('employee-account-trigger');
+  if (!menu || !trigger) return;
+  const isOpen = menu.classList.toggle('open');
+  trigger.setAttribute('aria-expanded', String(isOpen));
+}
+
+function selectEmployeeAccount(email, name, closeMenu = true) {
+  const accountInput = document.getElementById('employee-portal-email');
+  const accountLabel = document.getElementById('employee-account-label');
+  const menu = document.getElementById('employee-account-menu');
+  const trigger = document.getElementById('employee-account-trigger');
+  if (!accountInput || !accountLabel) return;
+
+  accountInput.value = email;
+  accountLabel.innerHTML = `<strong>${name}</strong><span>${email}</span>`;
+  document.querySelectorAll('.employee-account-option').forEach(option => {
+    option.classList.toggle('selected', option.dataset.email === email);
+  });
+  if (closeMenu && menu && trigger) {
+    menu.classList.remove('open');
+    trigger.setAttribute('aria-expanded', 'false');
+  }
 }
 
 function handlePortalLogin(e, role) {
@@ -167,8 +288,8 @@ function handlePortalLogin(e, role) {
   error.innerText = '';
 
   if (role === 'admin') {
-    const hrUser = appState.users.find(u => u.role === 'admin');
-    if (email.toLowerCase() !== hrUser.email.toLowerCase() || password !== HR_DEFAULT_PASSWORD) {
+    const hrUser = appState.users.find(u => u.role === 'admin' && u.email.toLowerCase() === email.toLowerCase());
+    if (!hrUser || password !== HR_DEFAULT_PASSWORD) {
       error.innerText = 'Invalid HR email or password. Please check your credentials.';
       return;
     }
@@ -418,6 +539,7 @@ function handleSignUpSubmit(e) {
 
   appState.users.push(newUser);
   renderEmployeeAccountOptions();
+  renderAdminAccountOptions();
   appState.activeRoleId = role;
   if (role === 'employee') appState.viewAsEmpId = empId;
   currentAuthUser = newUser;
@@ -960,6 +1082,19 @@ function closeModal(id) {
 }
 
 function openAuthModal() {
+  openModal('modal-auth');
+}
+
+function openAddEmployeeModal() {
+  if (appState.activeRoleId !== 'admin') {
+    showToast('Only Admin / HR can add employees.', 'info');
+    return;
+  }
+
+  switchAuthTab('signup');
+  document.getElementById('signup-role').value = 'employee';
+  document.getElementById('signup-password').value = 'Employee@123';
+  document.getElementById('signup-error-box').style.display = 'none';
   openModal('modal-auth');
 }
 

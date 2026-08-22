@@ -36,12 +36,19 @@
           <p>Manage people, attendance, payroll, approvals, and reports.</p>
         </div>
         <div class="portal-form-error" id="admin-portal-error"></div>
-        <label class="form-label" for="admin-portal-email">Work email</label>
-        <input class="form-control" id="admin-portal-email" type="email" value="sarah.connor@dayflow.io" placeholder="hr@dayflow.io" required>
+        <label class="form-label" for="admin-account-trigger">Choose HR account</label>
+        <div class="employee-account-picker admin-account-picker">
+          <input type="hidden" id="admin-portal-email" value="sarah.connor@dayflow.io" required>
+          <button class="form-control employee-account-trigger" id="admin-account-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="toggleAdminAccountPicker()">
+            <span id="admin-account-label">Select an HR email</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="employee-account-menu" id="admin-account-menu" role="listbox" aria-label="HR email accounts"></div>
+        </div>
         <label class="form-label" for="admin-portal-password">Password</label>
         <input class="form-control" id="admin-portal-password" type="password" placeholder="Enter HR password" required>
         <button class="btn btn-primary portal-login-button" type="submit"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign in to Admin / HR</button>
-        <small>Authorized HR access only</small>
+        <small>Demo password for all HR profiles: <strong>admin@123</strong></small>
       </form>
 
       <form class="portal-login-card employee-login-card" onsubmit="handlePortalLogin(event, 'employee')">
@@ -52,10 +59,15 @@
           <p>Track your workday, leave, attendance, profile, and salary.</p>
         </div>
         <div class="portal-form-error" id="employee-portal-error"></div>
-        <label class="form-label" for="employee-portal-email">Choose employee account</label>
-        <select class="form-control employee-account-select" id="employee-portal-email" size="4" required aria-label="Choose an employee account">
-          <!-- Populated from employee profiles -->
-        </select>
+        <label class="form-label" for="employee-account-trigger">Choose employee account</label>
+        <div class="employee-account-picker">
+          <input type="hidden" id="employee-portal-email" value="alex.morgan@dayflow.io" required>
+          <button class="form-control employee-account-trigger" id="employee-account-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="toggleEmployeeAccountPicker()">
+            <span id="employee-account-label">Select an employee email</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="employee-account-menu" id="employee-account-menu" role="listbox" aria-label="Employee email accounts"></div>
+        </div>
         <label class="form-label" for="employee-portal-password">Password</label>
         <input class="form-control" id="employee-portal-password" type="password" placeholder="Enter your password" required>
         <button class="btn btn-employee portal-login-button" type="submit"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign in to Employee Portal</button>
@@ -248,6 +260,9 @@
               <div class="glass-card">
                 <div class="card-header">
                   <div class="card-title"><i class="fa-solid fa-users-gear"></i> Company Employee Roster</div>
+                  <button class="btn btn-primary btn-sm hr-only-action" onclick="openAddEmployeeModal()">
+                    <i class="fa-solid fa-user-plus"></i> Add employee
+                  </button>
                 </div>
                 <div class="table-responsive">
                   <table class="custom-table">
@@ -947,7 +962,7 @@
           <label class="form-label">Password</label>
           <input type="password" class="form-control" id="signup-password" placeholder="e.g. Password@123" required>
           <span style="font-size: 0.725rem; color: #a5b4fc; margin-top: 0.35rem; display: block;">
-            🔒 Security Rules: Min 8 chars, 1 uppercase (A-Z), 1 number (0-9), & 1 special character (!@#$%^&*).
+            New employees can sign in with the shared demo password <strong>Employee@123</strong>.
           </span>
         </div>
 
