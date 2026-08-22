@@ -16,8 +16,8 @@ Access is role-based. Passwords are auto-generated from the registered email add
 
 | Role | Username Rule | Password Rule | Example Email | Example Password |
 |---|---|---|---|---|
-| **HR / Admin** | Registered email | First **3** characters of email + `@123` | `nehavgupta25@gmail.com` | `neh@123` |
-| **Employee** | Registered email | First **4** characters of email + `@123` | `nehavgupta25@gmail.com` | `neha@123` |
+| **HR / Admin** | Registered email | First **3** characters of email + `@123` | `nehavgupta@gmail.com` | `neh@123` |
+| **Employee** | Registered email | First **4** characters of email + `@123` | `nehavgupta@gmail.com` | `neha@123` |
 
 > ℹ️ Character count is taken from the part of the email before `@`, in lowercase.
 
